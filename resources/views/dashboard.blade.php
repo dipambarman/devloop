@@ -1,6 +1,8 @@
 <x-app-layout>
+    <x-slot name="title">Dashboard</x-slot>
+
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
                 <h2 class="text-2xl font-bold tracking-tight text-primary-text">
                     {{ __('Dashboard') }}

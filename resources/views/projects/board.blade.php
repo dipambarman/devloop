@@ -1,23 +1,23 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center gap-4">
-            <a href="{{ route('projects.show', $project) }}" class="text-secondary-text hover:text-primary-text transition-colors">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-            </a>
-            
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-white font-bold text-sm shadow-lg" style="background-color: {{ $project->color }}">
-                {{ strtoupper(substr($project->name, 0, 2)) }}
-            </div>
+        <div class="space-y-4">
+            <div class="flex items-center gap-4">
+                <a href="{{ route('projects.show', $project) }}" class="text-secondary-text hover:text-primary-text transition-colors">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                </a>
+                
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-white font-bold text-sm shadow-lg" style="background-color: {{ $project->color }}">
+                    {{ strtoupper(substr($project->name, 0, 2)) }}
+                </div>
 
-            <div class="flex-1">
-                <div class="flex items-center gap-3">
-                    <h2 class="text-2xl font-bold tracking-tight text-primary-text">{{ $project->name }} <span class="text-secondary-text font-normal">/ Board</span></h2>
+                <div class="flex-1 min-w-0">
+                    <h2 class="text-2xl font-bold tracking-tight text-primary-text truncate">{{ $project->name }} <span class="text-secondary-text font-normal">/ Board</span></h2>
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 flex-wrap">
                 <a href="{{ route('projects.discussions.index', $project) }}">
                     <x-primary-button class="!bg-surface !border-border !text-primary-text hover:!bg-surface-hover">
                         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -150,7 +150,7 @@
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                                     },
                                     body: JSON.stringify({
                                         status: newStatus,

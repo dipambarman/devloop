@@ -41,7 +41,7 @@
                  x-transition:leave="transition ease-in duration-75"
                  x-transition:leave-start="transform opacity-100 scale-100"
                  x-transition:leave-end="transform opacity-0 scale-95"
-                 class="absolute right-0 mt-2 w-80 rounded-xl shadow-xl glass z-50 py-1 border border-border"
+                 class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm rounded-xl shadow-xl glass z-50 py-1 border border-border"
                  style="display: none;">
                 
                 <div class="px-4 py-3 border-b border-border flex justify-between items-center bg-surface">
@@ -107,7 +107,7 @@
                 
                 <div class="px-4 py-2 border-b border-border">
                     <p class="text-sm font-medium text-primary-text">{{ Auth::user()->name ?? 'User' }}</p>
-                    <p class="text-xs text-secondary-text truncate">{{ Auth::user()->email ?? 'user@example.com' }}</p>
+                    <p class="text-xs text-secondary-text">Manage your account</p>
                 </div>
 
                 <x-dropdown-link :href="route('profile.edit')" class="text-secondary-text hover:bg-surface-hover hover:text-primary-text">

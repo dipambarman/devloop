@@ -60,9 +60,7 @@
                 <p class="text-sm font-medium text-primary-text truncate">
                     {{ Auth::user()->name ?? 'User' }}
                 </p>
-                <p class="text-xs text-secondary-text truncate">
-                    {{ Auth::user()->email ?? 'user@example.com' }}
-                </p>
+                <p class="text-xs text-secondary-text">Developer</p>
             </div>
         </div>
     </div>
