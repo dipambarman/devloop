@@ -49,7 +49,7 @@ class NoteController extends Controller
             'is_pinned' => 'boolean',
         ]);
 
-        $note = auth()->user()->notes()->create($request->all());
+        $note = auth()->user()->notes()->create($request->only(['title', 'content', 'project_id', 'is_pinned']));
 
         return redirect()->route('notes.index')->with('success', 'Note created successfully!');
     }
@@ -96,8 +96,7 @@ class NoteController extends Controller
             'is_pinned' => 'boolean',
         ]);
 
-        // Uncheck checkbox sends nothing, so default to false if missing
-        $data = $request->all();
+        $data = $request->only(['title', 'content', 'project_id']);
         $data['is_pinned'] = $request->has('is_pinned');
 
         $note->update($data);

@@ -14,13 +14,23 @@ class DashboardService
      */
     public function getStats(User $user): array
     {
+        $allProjectIds = $user->allProjects()->pluck('id');
+
+        // Count unique team members across all accessible projects
+        $teamMemberCount = \DB::table('project_user')
+            ->whereIn('project_id', $allProjectIds)
+            ->distinct('user_id')
+            ->count('user_id');
+        // Include the user themselves
+        $teamMemberCount = max($teamMemberCount + 1, 1);
+
         return [
-            'total_projects' => $user->projects()->count(),
-            'active_tasks' => Task::whereIn('project_id', $user->projects()->pluck('id'))
+            'total_projects' => $user->allProjects()->count(),
+            'active_tasks' => Task::whereIn('project_id', $allProjectIds)
                 ->whereNotIn('status', ['done'])
                 ->count(),
-            'team_members' => User::count(),
-            'completed_tasks' => Task::whereIn('project_id', $user->projects()->pluck('id'))
+            'team_members' => $teamMemberCount,
+            'completed_tasks' => Task::whereIn('project_id', $allProjectIds)
                 ->where('status', 'done')
                 ->count(),
         ];
@@ -31,7 +41,7 @@ class DashboardService
      */
     public function getRecentProjects(User $user, int $limit = 5)
     {
-        return $user->projects()
+        return $user->allProjects()
             ->withCount(['tasks', 'tasks as completed_tasks_count' => function ($query) {
                 $query->where('status', 'done');
             }])
@@ -45,7 +55,7 @@ class DashboardService
      */
     public function getRecentTasks(User $user, int $limit = 5)
     {
-        return Task::whereIn('project_id', $user->projects()->pluck('id'))
+        return Task::whereIn('project_id', $user->allProjects()->pluck('id'))
             ->with(['project', 'assignee'])
             ->latest()
             ->take($limit)
@@ -57,7 +67,7 @@ class DashboardService
      */
     public function getTaskDistribution(User $user): array
     {
-        $projectIds = $user->projects()->pluck('id');
+        $projectIds = $user->allProjects()->pluck('id');
 
         return [
             'todo' => Task::whereIn('project_id', $projectIds)->where('status', 'todo')->count(),

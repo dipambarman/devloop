@@ -51,13 +51,22 @@ class TaskController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(\Illuminate\Http\Request $request)
     {
-        $projects = auth()->user()->projects()->where('status', 'active')->get();
-        $users = User::all();
+        $projects = auth()->user()->allProjects()->where('status', 'active')->get();
+        $selectedProject = $request->query('project_id');
+        $users = collect();
+
+        if ($selectedProject) {
+            $project = \App\Models\Project::find($selectedProject);
+            if ($project && $project->isAccessibleBy(auth()->user())) {
+                $users = $project->members()->get()->push($project->owner)->unique('id');
+            }
+        }
+
         $tags = Tag::all();
 
-        return view('tasks.create', compact('projects', 'users', 'tags'));
+        return view('tasks.create', compact('projects', 'users', 'tags', 'selectedProject'));
     }
 
     /**
@@ -107,7 +116,7 @@ class TaskController extends Controller
         Gate::authorize('update', $task);
 
         $task->load(['project', 'tags']);
-        $users = User::all();
+        $users = $task->project->members()->get()->push($task->project->owner)->unique('id');
         $tags = Tag::all();
 
         return view('tasks.edit', compact('task', 'users', 'tags'));
@@ -186,8 +195,11 @@ class TaskController extends Controller
         }
 
         if ($request->has('order')) {
+            $projectTaskIds = $task->project->tasks()->pluck('id')->toArray();
             foreach ($request->order as $index => $taskId) {
-                Task::where('id', $taskId)->update(['order_column' => $index]);
+                if (in_array($taskId, $projectTaskIds)) {
+                    Task::where('id', $taskId)->update(['order_column' => $index]);
+                }
             }
         }
 

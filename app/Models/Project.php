@@ -17,7 +17,6 @@ class Project extends Model
         'status',
         'color',
         'github_repo',
-        'owner_id',
     ];
 
     public function owner()

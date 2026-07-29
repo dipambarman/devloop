@@ -21,14 +21,16 @@ Route::middleware('auth')->group(function () {
     Route::post('projects/{project}/members', [\App\Http\Controllers\ProjectController::class, 'addMember'])->name('projects.addMember');
     Route::delete('projects/{project}/members/{user}', [\App\Http\Controllers\ProjectController::class, 'removeMember'])->name('projects.removeMember');
     
-    // Project Discussions
-    Route::get('projects/{project}/discussions', [\App\Http\Controllers\DiscussionController::class, 'index'])->name('projects.discussions.index');
-    Route::post('projects/{project}/discussions', [\App\Http\Controllers\DiscussionController::class, 'store'])->name('projects.discussions.store');
-    Route::get('projects/{project}/discussions/{discussion}', [\App\Http\Controllers\DiscussionController::class, 'show'])->name('projects.discussions.show');
-    Route::delete('projects/{project}/discussions/{discussion}', [\App\Http\Controllers\DiscussionController::class, 'destroy'])->name('projects.discussions.destroy');
-    Route::patch('projects/{project}/discussions/{discussion}/pin', [\App\Http\Controllers\DiscussionController::class, 'togglePin'])->name('projects.discussions.togglePin');
-    Route::post('projects/{project}/discussions/{discussion}/replies', [\App\Http\Controllers\DiscussionController::class, 'storeReply'])->name('projects.discussions.replies.store');
-    Route::delete('projects/{project}/discussions/{discussion}/replies/{reply}', [\App\Http\Controllers\DiscussionController::class, 'destroyReply'])->name('projects.discussions.replies.destroy');
+    // Project Discussions (scoped binding ensures discussion belongs to the project)
+    Route::scopeBindings()->group(function () {
+        Route::get('projects/{project}/discussions', [\App\Http\Controllers\DiscussionController::class, 'index'])->name('projects.discussions.index');
+        Route::post('projects/{project}/discussions', [\App\Http\Controllers\DiscussionController::class, 'store'])->name('projects.discussions.store');
+        Route::get('projects/{project}/discussions/{discussion}', [\App\Http\Controllers\DiscussionController::class, 'show'])->name('projects.discussions.show');
+        Route::delete('projects/{project}/discussions/{discussion}', [\App\Http\Controllers\DiscussionController::class, 'destroy'])->name('projects.discussions.destroy');
+        Route::patch('projects/{project}/discussions/{discussion}/pin', [\App\Http\Controllers\DiscussionController::class, 'togglePin'])->name('projects.discussions.togglePin');
+        Route::post('projects/{project}/discussions/{discussion}/replies', [\App\Http\Controllers\DiscussionController::class, 'storeReply'])->name('projects.discussions.replies.store');
+        Route::delete('projects/{project}/discussions/{discussion}/replies/{reply}', [\App\Http\Controllers\DiscussionController::class, 'destroyReply'])->name('projects.discussions.replies.destroy');
+    });
 
     Route::resource('projects', \App\Http\Controllers\ProjectController::class);
     

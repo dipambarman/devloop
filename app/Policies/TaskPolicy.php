@@ -21,7 +21,7 @@ class TaskPolicy
      */
     public function view(User $user, Task $task): bool
     {
-        return $user->id === $task->project->owner_id || $user->id === $task->assignee_id;
+        return $task->project->isAccessibleBy($user);
     }
 
     /**
@@ -37,7 +37,7 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): bool
     {
-        return $user->id === $task->project->owner_id || $user->id === $task->assignee_id;
+        return $task->project->isAccessibleBy($user);
     }
 
     /**

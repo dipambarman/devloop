@@ -23,8 +23,11 @@ class SnippetController extends Controller
         }
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('code', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                  ->orWhere('code', 'like', '%' . $search . '%');
+            });
         }
 
         $snippets = $query->latest()->get();
@@ -56,7 +59,7 @@ class SnippetController extends Controller
             'project_id' => 'nullable|exists:projects,id',
         ]);
 
-        auth()->user()->snippets()->create($request->all());
+        auth()->user()->snippets()->create($request->only(['title', 'code', 'language', 'project_id']));
 
         return redirect()->route('snippets.index')->with('success', 'Snippet saved successfully!');
     }
@@ -103,7 +106,7 @@ class SnippetController extends Controller
             'project_id' => 'nullable|exists:projects,id',
         ]);
 
-        $snippet->update($request->all());
+        $snippet->update($request->only(['title', 'code', 'language', 'project_id']));
 
         return redirect()->route('snippets.index')->with('success', 'Snippet updated successfully!');
     }

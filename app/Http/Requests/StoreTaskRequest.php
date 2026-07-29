@@ -12,7 +12,17 @@ class StoreTaskRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $projectId = $this->input('project_id');
+        if (!$projectId) {
+            return false;
+        }
+
+        $project = \App\Models\Project::find($projectId);
+        if (!$project) {
+            return false;
+        }
+
+        return $project->isAccessibleBy($this->user());
     }
 
     /**
