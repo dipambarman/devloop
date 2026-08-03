@@ -59,9 +59,7 @@ class NoteController extends Controller
      */
     public function show(Note $note)
     {
-        if ($note->user_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('view', $note);
 
         return view('notes.show', compact('note'));
     }
@@ -71,9 +69,7 @@ class NoteController extends Controller
      */
     public function edit(Note $note)
     {
-        if ($note->user_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $note);
 
         $projects = auth()->user()->projects;
 
@@ -85,9 +81,7 @@ class NoteController extends Controller
      */
     public function update(Request $request, Note $note)
     {
-        if ($note->user_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $note);
 
         $request->validate([
             'title' => 'required|string|max:255',
@@ -109,9 +103,7 @@ class NoteController extends Controller
      */
     public function destroy(Note $note)
     {
-        if ($note->user_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('delete', $note);
 
         $note->delete();
 
@@ -123,9 +115,7 @@ class NoteController extends Controller
      */
     public function togglePin(Note $note)
     {
-        if ($note->user_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $note);
 
         $note->update(['is_pinned' => !$note->is_pinned]);
 

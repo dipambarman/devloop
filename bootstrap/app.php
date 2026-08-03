@@ -12,7 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Security headers on every response (XSS, clickjacking, MIME-sniff protection).
+        $middleware->append(\App\Http\Middleware\SecurityHeadersMiddleware::class);
+
+        // AuthenticateSession is required for Auth::logoutOtherDevices() to work.
+        $middleware->web(append: [
+            \Illuminate\Session\Middleware\AuthenticateSession::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

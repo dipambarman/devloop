@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Snippet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class SnippetController extends Controller
 {
@@ -69,9 +70,7 @@ class SnippetController extends Controller
      */
     public function show(Snippet $snippet)
     {
-        if ($snippet->user_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('view', $snippet);
 
         return view('snippets.show', compact('snippet'));
     }
@@ -81,9 +80,7 @@ class SnippetController extends Controller
      */
     public function edit(Snippet $snippet)
     {
-        if ($snippet->user_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $snippet);
 
         $projects = auth()->user()->projects;
 
@@ -95,9 +92,7 @@ class SnippetController extends Controller
      */
     public function update(Request $request, Snippet $snippet)
     {
-        if ($snippet->user_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $snippet);
 
         $request->validate([
             'title' => 'required|string|max:255',
@@ -116,9 +111,7 @@ class SnippetController extends Controller
      */
     public function destroy(Snippet $snippet)
     {
-        if ($snippet->user_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('delete', $snippet);
 
         $snippet->delete();
 

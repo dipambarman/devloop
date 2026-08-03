@@ -38,7 +38,7 @@ class DiscussionController extends Controller
 
         $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
+            'content' => 'required|string|max:10000',
         ]);
 
         $discussion = $project->discussions()->create([
@@ -87,7 +87,7 @@ class DiscussionController extends Controller
         Gate::authorize('view', $project);
 
         $request->validate([
-            'content' => 'required|string',
+            'content' => 'required|string|max:10000',
         ]);
 
         $reply = $discussion->replies()->create([
