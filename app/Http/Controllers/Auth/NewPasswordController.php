@@ -49,6 +49,14 @@ class NewPasswordController extends Controller
                 ])->save();
 
                 event(new PasswordReset($user));
+
+                // Destroy all existing sessions for this user.
+                // The user likely reset because their account was compromised.
+                if ($user->getAuthIdentifier()) {
+                    \Illuminate\Support\Facades\DB::table('sessions')
+                        ->where('user_id', $user->getAuthIdentifier())
+                        ->delete();
+                }
             }
         );
 
