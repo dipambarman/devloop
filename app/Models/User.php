@@ -51,11 +51,10 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function allProjects()
     {
-        $ownedIds = $this->projects()->pluck('id');
-        $memberIds = $this->memberProjects()->pluck('projects.id');
-        $allIds = $ownedIds->merge($memberIds)->unique();
-
-        return Project::whereIn('id', $allIds);
+        return Project::where('owner_id', $this->id)
+            ->orWhereHas('members', function ($query) {
+                $query->where('user_id', $this->id);
+            });
     }
 
     public function assignedTasks()

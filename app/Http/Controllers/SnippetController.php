@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSnippetRequest;
+use App\Http\Requests\UpdateSnippetRequest;
 use App\Models\Snippet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -13,7 +15,7 @@ class SnippetController extends Controller
      */
     public function index(Request $request)
     {
-        $query = auth()->user()->snippets();
+        $query = auth()->user()->snippets()->with('project');
 
         if ($request->filled('project_id')) {
             $query->where('project_id', $request->project_id);
@@ -31,8 +33,8 @@ class SnippetController extends Controller
             });
         }
 
-        $snippets = $query->latest()->get();
-        $projects = auth()->user()->projects;
+        $snippets = $query->latest()->paginate(15);
+        $projects = auth()->user()->allProjects()->get();
 
         return view('snippets.index', compact('snippets', 'projects'));
     }
@@ -42,7 +44,7 @@ class SnippetController extends Controller
      */
     public function create(Request $request)
     {
-        $projects = auth()->user()->projects;
+        $projects = auth()->user()->allProjects()->get();
         $selectedProject = $request->project_id;
         
         return view('snippets.create', compact('projects', 'selectedProject'));
@@ -51,16 +53,9 @@ class SnippetController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSnippetRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'code' => 'required|string',
-            'language' => 'required|string|max:50',
-            'project_id' => 'nullable|exists:projects,id',
-        ]);
-
-        auth()->user()->snippets()->create($request->only(['title', 'code', 'language', 'project_id']));
+        auth()->user()->snippets()->create($request->validated());
 
         return redirect()->route('snippets.index')->with('success', 'Snippet saved successfully!');
     }
@@ -82,7 +77,7 @@ class SnippetController extends Controller
     {
         Gate::authorize('update', $snippet);
 
-        $projects = auth()->user()->projects;
+        $projects = auth()->user()->allProjects()->get();
 
         return view('snippets.edit', compact('snippet', 'projects'));
     }
@@ -90,18 +85,11 @@ class SnippetController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Snippet $snippet)
+    public function update(UpdateSnippetRequest $request, Snippet $snippet)
     {
         Gate::authorize('update', $snippet);
 
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'code' => 'required|string',
-            'language' => 'required|string|max:50',
-            'project_id' => 'nullable|exists:projects,id',
-        ]);
-
-        $snippet->update($request->only(['title', 'code', 'language', 'project_id']));
+        $snippet->update($request->validated());
 
         return redirect()->route('snippets.index')->with('success', 'Snippet updated successfully!');
     }

@@ -86,6 +86,9 @@
                 </x-card>
             @endforeach
         </div>
+        <div class="mt-6">
+            {{ $notes->withQueryString()->links() }}
+        </div>
     @else
         <x-empty-state
             title="No notes found"

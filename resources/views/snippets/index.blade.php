@@ -110,6 +110,9 @@
                 </x-card>
             @endforeach
         </div>
+        <div class="mt-6">
+            {{ $snippets->withQueryString()->links() }}
+        </div>
     @else
         <x-empty-state
             title="No snippets found"

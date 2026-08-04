@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ProjectStatus;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateProjectRequest extends FormRequest
 {
@@ -25,7 +27,7 @@ class UpdateProjectRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
-            'status' => ['nullable', 'string', 'in:active,completed,archived'],
+            'status' => ['sometimes', Rule::enum(ProjectStatus::class)],
             'color' => ['nullable', 'string', 'max:7'],
             'github_repo' => ['nullable', 'string', 'max:255'],
         ];

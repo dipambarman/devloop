@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreNoteRequest;
+use App\Http\Requests\UpdateNoteRequest;
 use App\Models\Note;
-use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -14,14 +15,14 @@ class NoteController extends Controller
      */
     public function index(Request $request)
     {
-        $query = auth()->user()->notes();
+        $query = auth()->user()->notes()->with('project');
 
         if ($request->filled('project_id')) {
             $query->where('project_id', $request->project_id);
         }
 
-        $notes = $query->orderByDesc('is_pinned')->latest()->get();
-        $projects = auth()->user()->projects;
+        $notes = $query->orderByDesc('is_pinned')->latest()->paginate(15);
+        $projects = auth()->user()->allProjects()->get();
 
         return view('notes.index', compact('notes', 'projects'));
     }
@@ -31,7 +32,7 @@ class NoteController extends Controller
      */
     public function create(Request $request)
     {
-        $projects = auth()->user()->projects;
+        $projects = auth()->user()->allProjects()->get();
         $selectedProject = $request->project_id;
         
         return view('notes.create', compact('projects', 'selectedProject'));
@@ -40,16 +41,9 @@ class NoteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreNoteRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'nullable|string',
-            'project_id' => 'nullable|exists:projects,id',
-            'is_pinned' => 'boolean',
-        ]);
-
-        $note = auth()->user()->notes()->create($request->only(['title', 'content', 'project_id', 'is_pinned']));
+        auth()->user()->notes()->create($request->validated());
 
         return redirect()->route('notes.index')->with('success', 'Note created successfully!');
     }
@@ -71,7 +65,7 @@ class NoteController extends Controller
     {
         Gate::authorize('update', $note);
 
-        $projects = auth()->user()->projects;
+        $projects = auth()->user()->allProjects()->get();
 
         return view('notes.edit', compact('note', 'projects'));
     }
@@ -79,19 +73,12 @@ class NoteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Note $note)
+    public function update(UpdateNoteRequest $request, Note $note)
     {
         Gate::authorize('update', $note);
 
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'nullable|string',
-            'project_id' => 'nullable|exists:projects,id',
-            'is_pinned' => 'boolean',
-        ]);
-
-        $data = $request->only(['title', 'content', 'project_id']);
-        $data['is_pinned'] = $request->has('is_pinned');
+        $data = $request->validated();
+        $data['is_pinned'] = $request->boolean('is_pinned');
 
         $note->update($data);
 

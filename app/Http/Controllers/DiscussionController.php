@@ -108,9 +108,7 @@ class DiscussionController extends Controller
      */
     public function destroy(Project $project, Discussion $discussion)
     {
-        if ($discussion->user_id !== auth()->id() && $project->owner_id !== auth()->id()) {
-            abort(403);
-        }
+        abort_unless($discussion->user_id === auth()->id() || $project->owner_id === auth()->id(), 403);
 
         $discussion->delete();
 
@@ -123,9 +121,7 @@ class DiscussionController extends Controller
      */
     public function destroyReply(Project $project, Discussion $discussion, DiscussionReply $reply)
     {
-        if ($reply->user_id !== auth()->id() && $project->owner_id !== auth()->id()) {
-            abort(403);
-        }
+        abort_unless($reply->user_id === auth()->id() || $project->owner_id === auth()->id(), 403);
 
         $reply->delete();
 

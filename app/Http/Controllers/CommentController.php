@@ -14,7 +14,6 @@ class CommentController extends Controller
      */
     public function store(Request $request, Task $task)
     {
-        // Must be able to view the task to comment on it
         Gate::authorize('view', $task);
 
         $request->validate([
@@ -36,10 +35,7 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        // Only the comment author or project owner can delete it
-        if ($comment->user_id !== auth()->id() && $comment->task->project->owner_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('delete', $comment);
 
         $comment->delete();
 

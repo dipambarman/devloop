@@ -13,18 +13,8 @@ class DashboardController extends Controller
 
     public function index(Request $request)
     {
-        $user = $request->user();
+        $dashboardData = $this->dashboardService->getDashboardData($request->user());
 
-        $stats = $this->dashboardService->getStats($user);
-        $recentProjects = $this->dashboardService->getRecentProjects($user);
-        $recentTasks = $this->dashboardService->getRecentTasks($user);
-        $taskDistribution = $this->dashboardService->getTaskDistribution($user);
-
-        return view('dashboard', compact(
-            'stats',
-            'recentProjects',
-            'recentTasks',
-            'taskDistribution'
-        ));
+        return view('dashboard', $dashboardData);
     }
 }
