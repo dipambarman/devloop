@@ -169,65 +169,41 @@
 
     <!-- Recent Tasks -->
     <x-card>
-        <x-slot name="header">
-            <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-primary-text">Recent Tasks</h3>
-            </div>
-        </x-slot>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-primary-text">Recent Tasks</h3>
+            <a href="{{ route('tasks.index') }}" class="text-xs text-primary hover:underline">View all tasks &rarr;</a>
+        </div>
 
-        @if($recentTasks->count())
+        @if($recentTasks->count() > 0)
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left">
-                    <thead class="text-xs text-secondary-text uppercase tracking-wider border-b border-border">
-                        <tr>
+                    <thead>
+                        <tr class="text-xs text-tertiary-text border-b border-border uppercase tracking-wider">
                             <th class="px-4 py-3">Task</th>
                             <th class="px-4 py-3">Project</th>
                             <th class="px-4 py-3">Status</th>
                             <th class="px-4 py-3">Priority</th>
                             <th class="px-4 py-3">Assignee</th>
-                            <th class="px-4 py-3">Due Date</th>
+                            <th class="px-4 py-3">Due</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-border">
+                    <tbody class="divide-y divide-border/50">
                         @foreach($recentTasks as $task)
-                            <tr class="hover:bg-surface-hover transition-colors">
-                                <td class="px-4 py-3">
-                                    <span class="text-primary-text font-medium">{{ $task->title }}</span>
+                            <tr class="hover:bg-surface-hover/50 cursor-pointer transition-colors" onclick="window.location='{{ route('tasks.show', $task) }}'">
+                                <td class="px-4 py-3 font-medium text-primary-text max-w-[200px] truncate">
+                                    {{ $task->title }}
                                 </td>
                                 <td class="px-4 py-3">
-                                    <span class="text-secondary-text">{{ $task->project->name }}</span>
+                                    <div class="flex items-center gap-1.5">
+                                        <div class="w-2 h-2 rounded-full" style="background-color: {{ $task->project->color }}"></div>
+                                        <span class="text-secondary-text text-xs truncate max-w-[100px]">{{ $task->project->name }}</span>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-3">
-                                    @php
-                                        $statusColors = [
-                                            'todo' => 'gray',
-                                            'in_progress' => 'primary',
-                                            'review' => 'accent',
-                                            'done' => 'success',
-                                        ];
-                                        $statusLabels = [
-                                            'todo' => 'To Do',
-                                            'in_progress' => 'In Progress',
-                                            'review' => 'Review',
-                                            'done' => 'Done',
-                                        ];
-                                    @endphp
-                                    <x-badge :color="$statusColors[$task->status] ?? 'gray'">
-                                        {{ $statusLabels[$task->status] ?? ucfirst($task->status) }}
-                                    </x-badge>
+                                    <x-badge :value="$task->status" />
                                 </td>
                                 <td class="px-4 py-3">
-                                    @php
-                                        $priorityColors = [
-                                            'low' => 'gray',
-                                            'medium' => 'info',
-                                            'high' => 'warning',
-                                            'urgent' => 'danger',
-                                        ];
-                                    @endphp
-                                    <x-badge :color="$priorityColors[$task->priority] ?? 'gray'">
-                                        {{ ucfirst($task->priority) }}
-                                    </x-badge>
+                                    <x-badge :value="$task->priority" />
                                 </td>
                                 <td class="px-4 py-3">
                                     @if($task->assignee)

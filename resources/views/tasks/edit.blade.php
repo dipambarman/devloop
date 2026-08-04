@@ -38,10 +38,9 @@
                     <div>
                         <x-input-label for="status" value="Status" />
                         <select id="status" name="status" class="mt-1 block w-full border-border bg-background text-primary-text focus:border-primary focus:ring-primary rounded-xl shadow-sm">
-                            <option value="todo" {{ old('status', $task->status) === 'todo' ? 'selected' : '' }}>To Do</option>
-                            <option value="in_progress" {{ old('status', $task->status) === 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                            <option value="review" {{ old('status', $task->status) === 'review' ? 'selected' : '' }}>Review</option>
-                            <option value="done" {{ old('status', $task->status) === 'done' ? 'selected' : '' }}>Done</option>
+                            @foreach(\App\Enums\TaskStatus::cases() as $status)
+                                <option value="{{ $status->value }}" {{ old('status', $task->status->value) === $status->value ? 'selected' : '' }}>{{ $status->label() }}</option>
+                            @endforeach
                         </select>
                         <x-input-error class="mt-2" :messages="$errors->get('status')" />
                     </div>
@@ -50,10 +49,9 @@
                     <div>
                         <x-input-label for="priority" value="Priority" />
                         <select id="priority" name="priority" class="mt-1 block w-full border-border bg-background text-primary-text focus:border-primary focus:ring-primary rounded-xl shadow-sm">
-                            <option value="low" {{ old('priority', $task->priority) === 'low' ? 'selected' : '' }}>🟢 Low</option>
-                            <option value="medium" {{ old('priority', $task->priority) === 'medium' ? 'selected' : '' }}>🔵 Medium</option>
-                            <option value="high" {{ old('priority', $task->priority) === 'high' ? 'selected' : '' }}>🟠 High</option>
-                            <option value="urgent" {{ old('priority', $task->priority) === 'urgent' ? 'selected' : '' }}>🔴 Urgent</option>
+                            @foreach(\App\Enums\TaskPriority::cases() as $priority)
+                                <option value="{{ $priority->value }}" {{ old('priority', $task->priority->value) === $priority->value ? 'selected' : '' }}>{{ $priority->label() }}</option>
+                            @endforeach
                         </select>
                         <x-input-error class="mt-2" :messages="$errors->get('priority')" />
                     </div>

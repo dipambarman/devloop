@@ -106,26 +106,21 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-border/50">
-                            @php
-                                $statusColors = ['todo' => 'gray', 'in_progress' => 'primary', 'review' => 'warning', 'done' => 'success'];
-                                $statusLabels = ['todo' => 'To Do', 'in_progress' => 'In Progress', 'review' => 'Review', 'done' => 'Done'];
-                                $priorityColors = ['low' => 'gray', 'medium' => 'info', 'high' => 'warning', 'urgent' => 'danger'];
-                            @endphp
                             @foreach($tasks as $task)
                                 <tr class="hover:bg-surface-hover transition-colors cursor-pointer group" onclick="window.location='{{ route('tasks.show', $task) }}'">
                                     <td class="py-3 px-4">
                                         <div class="flex items-center gap-3">
-                                            @if($task->status === 'done')
+                                            @if($task->status === \App\Enums\TaskStatus::Done)
                                                 <div class="w-5 h-5 rounded-full bg-teal flex items-center justify-center text-white shrink-0">
                                                     <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
                                                 </div>
                                             @else
-                                                <div class="w-5 h-5 rounded-full border-2 border-secondary-text group-hover:border-primary transition-colors shrink-0"></div>
+                                                <div class="w-5 h-5 rounded-full border-2 border-border shrink-0"></div>
                                             @endif
                                             <div>
-                                                <span class="text-sm font-medium text-primary-text group-hover:text-primary transition-colors {{ $task->status === 'done' ? 'line-through opacity-50' : '' }}">{{ $task->title }}</span>
+                                                <span class="font-medium text-primary-text group-hover:text-primary transition-colors {{ $task->status === \App\Enums\TaskStatus::Done ? 'line-through text-secondary-text' : '' }}">{{ $task->title }}</span>
                                                 @if($task->tags->count())
-                                                    <div class="flex gap-1 mt-1">
+                                                    <div class="flex items-center gap-1 mt-1">
                                                         @foreach($task->tags->take(3) as $tag)
                                                             <span class="text-[9px] font-medium px-1 py-0.5 rounded text-white" style="background-color: {{ $tag->color }}">{{ $tag->name }}</span>
                                                         @endforeach
@@ -144,20 +139,16 @@
                                         </div>
                                     </td>
                                     <td class="py-3 px-4">
-                                        <x-badge :color="$statusColors[$task->status] ?? 'gray'" class="!text-[10px]">
-                                            {{ $statusLabels[$task->status] ?? $task->status }}
-                                        </x-badge>
+                                        <x-badge :value="$task->status" class="!text-[10px]" />
                                     </td>
                                     <td class="py-3 px-4">
-                                        <x-badge :color="$priorityColors[$task->priority] ?? 'gray'" class="!text-[10px]">
-                                            {{ ucfirst($task->priority) }}
-                                        </x-badge>
+                                        <x-badge :value="$task->priority" class="!text-[10px]" />
                                     </td>
                                     <td class="py-3 px-4">
                                         @if($task->due_date)
-                                            <span class="text-sm {{ $task->due_date->isPast() && $task->status !== 'done' ? 'text-red-500 font-medium' : 'text-secondary-text' }}">
+                                            <span class="text-sm {{ $task->due_date->isPast() && $task->status !== \App\Enums\TaskStatus::Done ? 'text-red-500 font-medium' : 'text-secondary-text' }}">
                                                 {{ $task->due_date->format('M d, Y') }}
-                                                @if($task->due_date->isPast() && $task->status !== 'done')
+                                                @if($task->due_date->isPast() && $task->status !== \App\Enums\TaskStatus::Done)
                                                     <span class="text-[10px] ml-1">(Overdue)</span>
                                                 @elseif($task->due_date->isToday())
                                                     <span class="text-[10px] text-warning ml-1">(Today)</span>

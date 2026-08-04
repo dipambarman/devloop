@@ -18,14 +18,9 @@
                     <form action="{{ route('tasks.updateStatusInline', $task) }}" method="POST" class="inline-block">
                         @csrf
                         @method('PATCH')
-                        <select name="status" onchange="this.form.submit()" class="text-xs font-medium px-2.5 py-1 rounded-full border-0 focus:ring-2 focus:ring-primary cursor-pointer 
-                            {{ $task->status === 'todo' ? 'bg-gray-500/20 text-gray-400' : '' }}
-                            {{ $task->status === 'in_progress' ? 'bg-primary/20 text-primary' : '' }}
-                            {{ $task->status === 'review' ? 'bg-warning/20 text-warning' : '' }}
-                            {{ $task->status === 'done' ? 'bg-success/20 text-success' : '' }}
-                        ">
-                            @foreach($statusLabels as $value => $label)
-                                <option value="{{ $value }}" {{ $task->status === $value ? 'selected' : '' }} class="bg-background text-primary-text">{{ $label }}</option>
+                        <select name="status" onchange="this.form.submit()" class="text-xs font-medium px-2.5 py-1 rounded-full border-0 focus:ring-2 focus:ring-primary cursor-pointer bg-surface border border-border text-primary-text">
+                            @foreach(\App\Enums\TaskStatus::cases() as $status)
+                                <option value="{{ $status->value }}" {{ $task->status === $status ? 'selected' : '' }} class="bg-background text-primary-text">{{ $status->label() }}</option>
                             @endforeach
                         </select>
                     </form>
@@ -33,16 +28,10 @@
                     <form action="{{ route('tasks.updatePriorityInline', $task) }}" method="POST" class="inline-block">
                         @csrf
                         @method('PATCH')
-                        <select name="priority" onchange="this.form.submit()" class="text-xs font-medium px-2.5 py-1 rounded-full border-0 focus:ring-2 focus:ring-primary cursor-pointer
-                            {{ $task->priority === 'low' ? 'bg-gray-500/20 text-gray-400' : '' }}
-                            {{ $task->priority === 'medium' ? 'bg-info/20 text-info' : '' }}
-                            {{ $task->priority === 'high' ? 'bg-warning/20 text-warning' : '' }}
-                            {{ $task->priority === 'urgent' ? 'bg-danger/20 text-danger' : '' }}
-                        ">
-                            <option value="low" {{ $task->priority === 'low' ? 'selected' : '' }} class="bg-background text-primary-text">Low</option>
-                            <option value="medium" {{ $task->priority === 'medium' ? 'selected' : '' }} class="bg-background text-primary-text">Medium</option>
-                            <option value="high" {{ $task->priority === 'high' ? 'selected' : '' }} class="bg-background text-primary-text">High</option>
-                            <option value="urgent" {{ $task->priority === 'urgent' ? 'selected' : '' }} class="bg-background text-primary-text">Urgent</option>
+                        <select name="priority" onchange="this.form.submit()" class="text-xs font-medium px-2.5 py-1 rounded-full border-0 focus:ring-2 focus:ring-primary cursor-pointer bg-surface border border-border text-primary-text">
+                            @foreach(\App\Enums\TaskPriority::cases() as $priority)
+                                <option value="{{ $priority->value }}" {{ $task->priority === $priority ? 'selected' : '' }} class="bg-background text-primary-text">{{ $priority->label() }}</option>
+                            @endforeach
                         </select>
                     </form>
                 </div>

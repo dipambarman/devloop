@@ -38,9 +38,9 @@
                     <div>
                         <x-input-label for="status" value="Status" />
                         <select id="status" name="status" class="mt-1 block w-full border-border bg-background text-primary-text focus:border-primary focus:ring-primary rounded-xl shadow-sm">
-                            <option value="active" {{ old('status', $project->status) === 'active' ? 'selected' : '' }}>Active</option>
-                            <option value="completed" {{ old('status', $project->status) === 'completed' ? 'selected' : '' }}>Completed</option>
-                            <option value="archived" {{ old('status', $project->status) === 'archived' ? 'selected' : '' }}>Archived</option>
+                            @foreach(\App\Enums\ProjectStatus::cases() as $status)
+                                <option value="{{ $status->value }}" {{ old('status', $project->status->value) === $status->value ? 'selected' : '' }}>{{ $status->label() }}</option>
+                            @endforeach
                         </select>
                         <x-input-error class="mt-2" :messages="$errors->get('status')" />
                     </div>

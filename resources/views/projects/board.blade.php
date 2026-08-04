@@ -97,9 +97,7 @@
 
                             <div class="flex items-center justify-between mt-4">
                                 <div class="flex items-center gap-2">
-                                    <x-badge :color="$priorityColors[$task->priority] ?? 'gray'" class="!text-[10px] !py-0 !px-1.5">
-                                        {{ ucfirst($task->priority) }}
-                                    </x-badge>
+                                    <x-badge :value="$task->priority" class="!text-[10px] !py-0 !px-1.5" />
 
                                     @if($task->comments_count > 0)
                                         <div class="flex items-center text-xs text-secondary-text gap-1">

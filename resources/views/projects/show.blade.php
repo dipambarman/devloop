@@ -15,9 +15,7 @@
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-3">
                         <h2 class="text-2xl font-bold tracking-tight text-primary-text truncate">{{ $project->name }}</h2>
-                        <x-badge :color="$project->status === 'active' ? 'success' : ($project->status === 'completed' ? 'primary' : 'gray')">
-                            {{ ucfirst($project->status) }}
-                        </x-badge>
+                        <x-badge :value="$project->status" />
                     </div>
                     @if($project->github_repo)
                         <a href="https://github.com/{{ $project->github_repo }}" target="_blank" rel="noopener noreferrer" class="text-sm text-secondary-text hover:text-primary mt-1 inline-flex items-center gap-1 transition-colors">
@@ -117,24 +115,14 @@
                                     </div>
                                     
                                     <div>
-                                        <p class="text-sm font-medium text-primary-text {{ $task->status === 'done' ? 'line-through opacity-50' : '' }}">
+                                        <p class="text-sm font-medium text-primary-text {{ $task->status === \App\Enums\TaskStatus::Done ? 'line-through opacity-50' : '' }}">
                                             {{ $task->title }}
                                         </p>
                                         <div class="flex items-center gap-3 mt-1">
-                                            @php
-                                                $priorityColors = [
-                                                    'low' => 'gray',
-                                                    'medium' => 'info',
-                                                    'high' => 'warning',
-                                                    'urgent' => 'danger',
-                                                ];
-                                            @endphp
-                                            <x-badge :color="$priorityColors[$task->priority] ?? 'gray'" class="!text-[10px] !py-0 !px-1.5">
-                                                {{ ucfirst($task->priority) }}
-                                            </x-badge>
+                                            <x-badge :value="$task->priority" class="!text-[10px] !py-0 !px-1.5" />
 
                                             @if($task->due_date)
-                                                <span class="text-xs text-secondary-text flex items-center gap-1 {{ $task->due_date->isPast() && $task->status !== 'done' ? 'text-red-500 font-medium' : '' }}">
+                                                <span class="text-xs text-secondary-text flex items-center gap-1 {{ $task->due_date->isPast() && $task->status !== \App\Enums\TaskStatus::Done ? 'text-red-500 font-medium' : '' }}">
                                                     <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                                     {{ $task->due_date->format('M d') }}
                                                 </span>
