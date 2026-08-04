@@ -2,8 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Enums\ProjectStatus;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Project>
@@ -20,12 +23,12 @@ class ProjectFactory extends Factory
         $name = fake()->company() . ' ' . fake()->word();
         return [
             'name' => $name,
-            'slug' => \Illuminate\Support\Str::slug($name),
+            'slug' => Str::slug($name),
             'description' => fake()->paragraph(),
-            'status' => fake()->randomElement(['active', 'active', 'active', 'completed', 'archived']),
+            'status' => fake()->randomElement([ProjectStatus::Active, ProjectStatus::Active, ProjectStatus::OnHold, ProjectStatus::Archived]),
             'color' => fake()->hexColor(),
-            'github_repo' => 'devloop/' . \Illuminate\Support\Str::slug($name),
-            'owner_id' => \App\Models\User::factory(),
+            'github_repo' => 'devloop/' . Str::slug($name),
+            'owner_id' => User::factory(),
         ];
     }
 }

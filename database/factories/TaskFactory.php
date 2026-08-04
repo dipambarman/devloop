@@ -2,7 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Enums\TaskPriority;
+use App\Enums\TaskStatus;
+use App\Models\Project;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,13 +22,13 @@ class TaskFactory extends Factory
     public function definition(): array
     {
         return [
-            'project_id' => \App\Models\Project::factory(),
+            'project_id' => Project::factory(),
             'title' => fake()->sentence(4),
             'description' => fake()->paragraph(),
-            'status' => fake()->randomElement(['todo', 'todo', 'in_progress', 'review', 'done']),
-            'priority' => fake()->randomElement(['low', 'medium', 'medium', 'high', 'urgent']),
-            'assignee_id' => \App\Models\User::factory(),
-            'creator_id' => \App\Models\User::factory(),
+            'status' => fake()->randomElement([TaskStatus::Todo, TaskStatus::Todo, TaskStatus::InProgress, TaskStatus::Review, TaskStatus::Done]),
+            'priority' => fake()->randomElement([TaskPriority::Low, TaskPriority::Medium, TaskPriority::Medium, TaskPriority::High, TaskPriority::Urgent]),
+            'assignee_id' => User::factory(),
+            'creator_id' => User::factory(),
             'due_date' => fake()->boolean(70) ? fake()->dateTimeBetween('now', '+2 months') : null,
         ];
     }
