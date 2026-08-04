@@ -16,11 +16,11 @@ return new class extends Migration
             $table->foreignId('project_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->string('status')->default('todo'); // todo, in_progress, review, done
-            $table->string('priority')->default('medium'); // low, medium, high, urgent
+            $table->string('status')->default('todo')->index();
+            $table->string('priority')->default('medium')->index();
             $table->foreignId('assignee_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('creator_id')->constrained('users');
-            $table->date('due_date')->nullable();
+            $table->foreignId('creator_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->date('due_date')->nullable()->index();
             $table->timestamps();
             $table->softDeletes();
         });

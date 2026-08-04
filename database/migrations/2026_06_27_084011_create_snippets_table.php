@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('code');
             $table->string('language')->default('plaintext');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

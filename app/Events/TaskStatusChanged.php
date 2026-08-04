@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
@@ -12,15 +13,12 @@ class TaskStatusChanged extends ProjectActivityEvent
         Project $project,
         User $user,
         public Task $task,
-        public string $oldStatus,
-        public string $newStatus,
+        public TaskStatus $oldStatus,
+        public TaskStatus $newStatus,
     ) {
-        $labels = ['todo' => 'To Do', 'in_progress' => 'In Progress', 'review' => 'Review', 'done' => 'Done'];
-        $old = $labels[$oldStatus] ?? $oldStatus;
-        $new = $labels[$newStatus] ?? $newStatus;
-        parent::__construct($project, $user, "changed '{$task->title}' from {$old} to {$new}", [
-            'old_status' => $oldStatus,
-            'new_status' => $newStatus,
+        parent::__construct($project, $user, "changed '{$task->title}' from {$oldStatus->label()} to {$newStatus->label()}", [
+            'old_status' => $oldStatus->value,
+            'new_status' => $newStatus->value,
         ]);
     }
 

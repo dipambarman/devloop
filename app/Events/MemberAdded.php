@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Enums\ProjectRole;
 use App\Models\Project;
 use App\Models\User;
 
@@ -11,11 +12,11 @@ class MemberAdded extends ProjectActivityEvent
         Project $project,
         User $user,
         public User $member,
-        public string $role,
+        public ProjectRole $role,
     ) {
-        parent::__construct($project, $user, "added {$member->name} as {$role}", [
+        parent::__construct($project, $user, "added {$member->name} as {$role->label()}", [
             'member_id' => $member->id,
-            'role' => $role,
+            'role' => $role->value,
         ]);
     }
 

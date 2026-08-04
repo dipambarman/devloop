@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
@@ -27,11 +28,11 @@ class DashboardService
         return [
             'total_projects' => $user->allProjects()->count(),
             'active_tasks' => Task::whereIn('project_id', $allProjectIds)
-                ->whereNotIn('status', ['done'])
+                ->whereNotIn('status', [TaskStatus::Done])
                 ->count(),
             'team_members' => $teamMemberCount,
             'completed_tasks' => Task::whereIn('project_id', $allProjectIds)
-                ->where('status', 'done')
+                ->where('status', TaskStatus::Done)
                 ->count(),
         ];
     }
@@ -43,7 +44,7 @@ class DashboardService
     {
         return $user->allProjects()
             ->withCount(['tasks', 'tasks as completed_tasks_count' => function ($query) {
-                $query->where('status', 'done');
+                $query->where('status', TaskStatus::Done);
             }])
             ->latest()
             ->take($limit)
@@ -70,10 +71,10 @@ class DashboardService
         $projectIds = $user->allProjects()->pluck('id');
 
         return [
-            'todo' => Task::whereIn('project_id', $projectIds)->where('status', 'todo')->count(),
-            'in_progress' => Task::whereIn('project_id', $projectIds)->where('status', 'in_progress')->count(),
-            'review' => Task::whereIn('project_id', $projectIds)->where('status', 'review')->count(),
-            'done' => Task::whereIn('project_id', $projectIds)->where('status', 'done')->count(),
+            'todo' => Task::whereIn('project_id', $projectIds)->where('status', TaskStatus::Todo)->count(),
+            'in_progress' => Task::whereIn('project_id', $projectIds)->where('status', TaskStatus::InProgress)->count(),
+            'review' => Task::whereIn('project_id', $projectIds)->where('status', TaskStatus::Review)->count(),
+            'done' => Task::whereIn('project_id', $projectIds)->where('status', TaskStatus::Done)->count(),
         ];
     }
 }

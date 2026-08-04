@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProjectRole;
+use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\User;
 use App\Http\Requests\StoreProjectRequest;
@@ -9,6 +11,7 @@ use App\Http\Requests\UpdateProjectRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
@@ -19,7 +22,7 @@ class ProjectController extends Controller
     {
         $projects = auth()->user()->allProjects()
             ->withCount(['tasks', 'tasks as completed_tasks_count' => function ($query) {
-                $query->where('status', 'done');
+                $query->where('status', TaskStatus::Done);
             }])
             ->latest()
             ->paginate(12);
@@ -60,7 +63,7 @@ class ProjectController extends Controller
         Gate::authorize('view', $project);
 
         $project->loadCount(['tasks', 'tasks as completed_tasks_count' => function ($query) {
-            $query->where('status', 'done');
+            $query->where('status', TaskStatus::Done);
         }]);
 
         $project->load(['members', 'owner']);
@@ -92,10 +95,10 @@ class ProjectController extends Controller
 
         // Group tasks by status
         $tasksByStatus = [
-            'todo' => $project->tasks->where('status', 'todo')->values(),
-            'in_progress' => $project->tasks->where('status', 'in_progress')->values(),
-            'review' => $project->tasks->where('status', 'review')->values(),
-            'done' => $project->tasks->where('status', 'done')->values(),
+            'todo' => $project->tasks->where('status', TaskStatus::Todo)->values(),
+            'in_progress' => $project->tasks->where('status', TaskStatus::InProgress)->values(),
+            'review' => $project->tasks->where('status', TaskStatus::Review)->values(),
+            'done' => $project->tasks->where('status', TaskStatus::Done)->values(),
         ];
 
         return view('projects.board', compact('project', 'tasksByStatus'));
@@ -153,7 +156,7 @@ class ProjectController extends Controller
 
         $request->validate([
             'email' => 'required|email',
-            'role' => 'required|in:member,viewer',
+            'role' => ['required', Rule::enum(ProjectRole::class)],
         ]);
 
         $user = User::where('email', $request->email)->first();
@@ -170,9 +173,10 @@ class ProjectController extends Controller
             return redirect()->back()->with('error', 'This user is already a member of this project.');
         }
 
-        $project->members()->attach($user->id, ['role' => $request->role]);
+        $role = ProjectRole::from($request->role);
+        $project->members()->attach($user->id, ['role' => $role->value]);
 
-        \App\Events\MemberAdded::dispatch($project, auth()->user(), $user, $request->role);
+        \App\Events\MemberAdded::dispatch($project, auth()->user(), $user, $role);
 
         return redirect()->back()->with('success', "{$user->name} has been added to the project!");
     }

@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProjectStatus;
+use App\Enums\TaskPriority;
+use App\Enums\TaskStatus;
 use App\Models\Task;
 use App\Models\Tag;
 use App\Models\User;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class TaskController extends Controller
 {
@@ -43,7 +47,7 @@ class TaskController extends Controller
         }
 
         $tasks = $query->latest()->paginate(15);
-        $projects = auth()->user()->projects()->where('status', 'active')->get();
+        $projects = auth()->user()->projects()->where('status', ProjectStatus::Active)->get();
 
         return view('tasks.index', compact('tasks', 'projects'));
     }
@@ -53,7 +57,7 @@ class TaskController extends Controller
      */
     public function create(\Illuminate\Http\Request $request)
     {
-        $projects = auth()->user()->allProjects()->where('status', 'active')->get();
+        $projects = auth()->user()->allProjects()->where('status', ProjectStatus::Active)->get();
         $selectedProject = $request->query('project_id');
         $users = collect();
 
@@ -78,8 +82,8 @@ class TaskController extends Controller
             'project_id' => $request->project_id,
             'title' => $request->title,
             'description' => $request->description,
-            'status' => $request->status ?? 'todo',
-            'priority' => $request->priority ?? 'medium',
+            'status' => $request->status ?? TaskStatus::Todo,
+            'priority' => $request->priority ?? TaskPriority::Medium,
             'assignee_id' => $request->assignee_id,
             'creator_id' => auth()->id(),
             'due_date' => $request->due_date,
@@ -180,7 +184,7 @@ class TaskController extends Controller
         Gate::authorize('update', $task);
 
         $request->validate([
-            'status' => 'required|in:todo,in_progress,review,done',
+            'status' => ['required', Rule::enum(TaskStatus::class)],
             'order' => 'array'
         ]);
 
@@ -213,7 +217,7 @@ class TaskController extends Controller
     {
         Gate::authorize('update', $task);
 
-        $request->validate(['status' => 'required|in:todo,in_progress,review,done']);
+        $request->validate(['status' => ['required', Rule::enum(TaskStatus::class)]]);
 
         $oldStatus = $task->status;
         $task->update(['status' => $request->status]);
@@ -232,7 +236,7 @@ class TaskController extends Controller
     {
         Gate::authorize('update', $task);
 
-        $request->validate(['priority' => 'required|in:low,medium,high,urgent']);
+        $request->validate(['priority' => ['required', Rule::enum(TaskPriority::class)]]);
 
         $oldPriority = $task->priority;
         $task->update(['priority' => $request->priority]);

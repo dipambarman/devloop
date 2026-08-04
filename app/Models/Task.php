@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Enums\TaskPriority;
+use App\Enums\TaskStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Task extends Model
 {
     /** @use HasFactory<\Database\Factories\TaskFactory> */
-    use HasFactory, \Illuminate\Database\Eloquent\SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'project_id',
@@ -19,10 +22,13 @@ class Task extends Model
         'assignee_id',
         'creator_id',
         'due_date',
+        'order_column',
     ];
 
     protected $casts = [
         'due_date' => 'date',
+        'status' => TaskStatus::class,
+        'priority' => TaskPriority::class,
     ];
 
     public function project()

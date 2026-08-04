@@ -17,8 +17,9 @@ return new class extends Migration
             $table->foreignId('project_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->text('content')->nullable();
-            $table->boolean('is_pinned')->default(false);
+            $table->boolean('is_pinned')->default(false)->index();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

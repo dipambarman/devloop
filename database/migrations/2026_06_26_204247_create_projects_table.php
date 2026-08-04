@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
-            $table->string('status')->default('active');
-            $table->string('color')->default('#6366F1'); // Primary indigo color
+            $table->string('status')->default('active')->index();
+            $table->string('color')->default('#6366F1');
             $table->string('github_repo')->nullable();
             $table->foreignId('owner_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
