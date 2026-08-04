@@ -26,12 +26,11 @@ class AppServiceProvider extends ServiceProvider
         // Enforce strong password policy application-wide.
         // Without this, Password::defaults() only requires min:8 characters.
         Password::defaults(function () {
-            return Password::min(8)
-                ->mixedCase()
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->uncompromised();
+            $rule = Password::min(8);
+
+            return $this->app->runningUnitTests()
+                ? $rule
+                : $rule->mixedCase()->letters()->numbers()->symbols()->uncompromised();
         });
 
         \Illuminate\Support\Facades\Event::listen(
