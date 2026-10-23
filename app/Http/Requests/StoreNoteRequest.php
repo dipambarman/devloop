@@ -8,14 +8,19 @@ class StoreNoteRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        if ($projectId = $this->input('project_id')) {
+            $project = \App\Models\Project::find($projectId);
+            return $project && $project->isAccessibleBy($this->user());
+        }
+
+        return true; // project_id is nullable
     }
 
     public function rules(): array
     {
         return [
             'title' => 'required|string|max:255',
-            'content' => 'nullable|string',
+            'content' => 'nullable|string|max:50000',
             'project_id' => 'nullable|exists:projects,id',
             'is_pinned' => 'boolean',
         ];

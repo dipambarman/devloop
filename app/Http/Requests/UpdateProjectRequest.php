@@ -28,8 +28,8 @@ class UpdateProjectRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:5000'],
             'status' => ['sometimes', Rule::enum(ProjectStatus::class)],
-            'color' => ['nullable', 'string', 'max:7'],
-            'github_repo' => ['nullable', 'string', 'max:255'],
+            'color' => ['nullable', 'string', 'regex:/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/'],
+            'github_repo' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_.-]+(\/[a-zA-Z0-9_.-]+)?$/'],
         ];
     }
 }

@@ -10,7 +10,6 @@ class Snippet extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'user_id',
         'project_id',
         'title',
         'code',

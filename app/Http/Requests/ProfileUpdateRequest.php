@@ -28,9 +28,9 @@ class ProfileUpdateRequest extends FormRequest
             ],
             'bio' => ['nullable', 'string', 'max:1000'],
             'skills' => ['nullable', 'string'], // Stored as JSON, but comes in as comma-separated string from the form
-            'github_url' => ['nullable', 'url', 'max:255'],
-            'portfolio_url' => ['nullable', 'url', 'max:255'],
-            'linkedin_url' => ['nullable', 'url', 'max:255'],
+            'github_url' => ['nullable', 'url:http,https', 'max:255'],
+            'portfolio_url' => ['nullable', 'url:http,https', 'max:255'],
+            'linkedin_url' => ['nullable', 'url:http,https', 'max:255'],
         ];
     }
 }
