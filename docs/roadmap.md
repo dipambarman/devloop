@@ -59,15 +59,23 @@ Production-grade security for a developer platform.
 
 ### Phase 5: Deployment & Infrastructure 🚧
 
-Preparing the application for production hosting.
+Preparing the application for production hosting and public launch.
 
-- [ ] Oracle Cloud Always Free deployment (documented in `oracle-deployment-roadmap.md`)
-- [ ] Nginx reverse proxy configuration
-- [ ] Free SSL via Let's Encrypt / Certbot
-- [ ] DuckDNS domain setup
-- [ ] Laravel production caching (config, routes, views)
-- [ ] Queue worker setup for background jobs
-- [ ] Automated database backups
+- [x] Multi-stage production Dockerfile (Node 20 + Composer 2 + PHP 8.3-FPM)
+- [x] Docker Compose 5-service production stack (App, Nginx, MySQL 8.4, Redis 7, Queue worker)
+- [x] Nginx reverse proxy configuration (`docker/nginx/default.conf`) with gzip & cache headers
+- [x] PHP 8.3 production configuration (`docker/php/php-production.ini`) with OPcache & JIT
+- [x] MySQL 8.4 production tuning configuration (`docker/mysql/my.cnf`)
+- [x] GitHub Actions CI test pipeline (`.github/workflows/test.yml`)
+- [x] GitHub Actions CD automated deploy pipeline (`.github/workflows/deploy.yml`)
+- [x] Production environment template (`.env.production`)
+- [x] Public marketing landing page (`resources/views/welcome.blade.php`) with cosmic dark theme
+- [x] Crawler & SEO optimization (`public/robots.txt`)
+- [ ] Oracle Cloud Always Free VM instance setup (Ubuntu 24.04 on Ampere A1)
+- [ ] DuckDNS dynamic DNS setup (`devloop.duckdns.org`)
+- [ ] Free SSL certificate via Let's Encrypt / Certbot
+- [ ] Automated daily database backup script with rotation
+- [ ] Queue worker supervisor & health check monitoring (UptimeRobot)
 
 ### Phase 6: Communication & Notifications 📋
 
@@ -134,4 +142,4 @@ DevLoop follows semantic versioning:
 - **Minor** — New features and non-breaking enhancements
 - **Patch** — Bug fixes and security patches
 
-Current version: **v1.3.0**
+Current version: **v1.4.0 (Infrastructure & Launch Prep)**

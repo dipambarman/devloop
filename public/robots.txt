@@ -1,10 +1,17 @@
-# DevLoop - Private Application
-# Block all crawlers from indexing any page
+# DevLoop — Developer Collaboration Platform
+# Allow search engines to index the public landing page
 
 User-agent: *
-Disallow: /
+Allow: /
+Disallow: /dashboard
+Disallow: /projects
+Disallow: /tasks
+Disallow: /notes
+Disallow: /snippets
+Disallow: /profile
+Disallow: /notifications
 
-# Block common AI/scraping bots explicitly
+# Block AI/scraping bots from authenticated content
 User-agent: GPTBot
 Disallow: /
 
@@ -17,10 +24,8 @@ Disallow: /
 User-agent: anthropic-ai
 Disallow: /
 
-User-agent: Google-Extended
-Disallow: /
-
 User-agent: Bytespider
 Disallow: /
 
-# No sitemap - private application
+# Sitemap
+Sitemap: https://devloop.duckdns.org/sitemap.xml

@@ -16,4 +16,12 @@ test('new users can register', function () {
 
     $this->assertAuthenticated();
     $response->assertRedirect(route('dashboard', absolute: false));
+
+    $user = \App\Models\User::where('email', 'test@example.com')->first();
+    expect($user)->not->toBeNull();
+    expect($user->projects()->count())->toBe(1);
+    expect($user->notes()->count())->toBe(1);
+    expect($user->snippets()->count())->toBe(1);
+    expect($user->projects()->first()->tasks()->count())->toBe(5);
 });
+

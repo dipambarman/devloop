@@ -1,0 +1,41 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Dependencies (rebuilt inside container)
+node_modules
+vendor
+
+# Development files
+.env
+.env.local
+.editorconfig
+.npmrc
+
+# Build artifacts
+public/hot
+public/build
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Tests
+tests
+phpunit.xml
+
+# Documentation
+docs
+README.md
+
+# Docker files (prevent recursive copies)
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# OS files
+Thumbs.db
+.DS_Store
