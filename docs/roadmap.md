@@ -93,11 +93,11 @@ Expanding the notification system with event-driven alerts and user preferences.
 - [ ] Digest emails (daily/weekly summary of project activity)
 - [ ] Webhook support for external integrations
 
-### Phase 7: Advanced Project Management 📋
+### Phase 7: Advanced Project Management 🚧
 
 Features for teams managing larger projects.
 
-- [ ] Calendar view for tasks with due dates
+- [x] Interactive calendar view for tasks with due dates (`/calendar` & `/projects/{project}/calendar`)
 - [ ] Sprint planning — group tasks into time-boxed sprints
 - [ ] Milestone tracking — group tasks into release milestones
 - [ ] Task dependencies — mark tasks as blocked by other tasks

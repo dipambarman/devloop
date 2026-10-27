@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscussionController;
@@ -34,7 +35,9 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
     // Index, show, edit forms, create forms — no extra throttle.
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
     Route::get('projects/{project}/board', [ProjectController::class, 'board'])->name('projects.board');
+    Route::get('projects/{project}/calendar', [CalendarController::class, 'index'])->name('projects.calendar');
 
     Route::scopeBindings()->group(function () {
         Route::get('projects/{project}/discussions', [DiscussionController::class, 'index'])->name('projects.discussions.index');
