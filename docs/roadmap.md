@@ -71,11 +71,14 @@ Preparing the application for production hosting and public launch.
 - [x] Production environment template (`.env.production`)
 - [x] Public marketing landing page (`resources/views/welcome.blade.php`) with cosmic dark theme
 - [x] Crawler & SEO optimization (`public/robots.txt`)
+- [x] Automated daily database backup command (`php artisan db:backup`) with gzip compression and retention rotation
+- [x] Production backup runner script (`scripts/backup.sh`)
+- [x] Deep application health check probe (`/health` & `/api/health`) covering database latency, cache, disk, and queue status
+- [x] Queue worker and failed job monitoring (`php artisan queue:monitor-health`)
+- [x] Automated daily backup and hourly queue monitoring schedule in `routes/console.php`
 - [ ] Oracle Cloud Always Free VM instance setup (Ubuntu 24.04 on Ampere A1)
 - [ ] DuckDNS dynamic DNS setup (`devloop.duckdns.org`)
 - [ ] Free SSL certificate via Let's Encrypt / Certbot
-- [ ] Automated daily database backup script with rotation
-- [ ] Queue worker supervisor & health check monitoring (UptimeRobot)
 
 ### Phase 6: Communication & Notifications 📋
 

@@ -16,7 +16,7 @@ This document tracks the completion status of every major feature and subsystem 
 | Developer Workspace | ✅ Complete | 100% |
 | Dashboard & Analytics | ✅ Complete | 100% |
 | Security Hardening | ✅ Complete | 100% |
-| Deployment | 🚧 In Progress | 75% |
+| Deployment | 🚧 In Progress | 90% |
 | Email Notifications | 📋 Planned | 0% |
 | Integrations | 📋 Planned | 0% |
 
@@ -157,6 +157,9 @@ This document tracks the completion status of every major feature and subsystem 
 | GitHub Actions CI workflow (automated tests on push/PR) | ✅ |
 | GitHub Actions CD workflow (automated SSH deployment to main) | ✅ |
 | Oracle Cloud Always Free deployment guide | ✅ |
+| Automated database backups with gzip & rotation | ✅ |
+| Deep application health check probe (/health) | ✅ |
+| Queue worker & failed-job monitoring command | ✅ |
+| Automated console schedule for backups & queues | ✅ |
 | Live Oracle Cloud VM instance execution | 📋 Next |
 | DuckDNS dynamic DNS & Let's Encrypt SSL setup | 📋 Next |
-| Automated database backups with rotation | 📋 Planned |

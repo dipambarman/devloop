@@ -17,6 +17,10 @@ Route::get('/', function () {
 
 Route::view('/changelog', 'changelog')->name('changelog');
 
+// System Health & Monitoring Probe
+Route::get('/health', \App\Http\Controllers\HealthCheckController::class)->name('health');
+Route::get('/api/health', \App\Http\Controllers\HealthCheckController::class)->name('api.health');
+
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
