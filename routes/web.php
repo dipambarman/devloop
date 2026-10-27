@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BugController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DashboardController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\NoteController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectKeyController;
 use App\Http\Controllers\SnippetController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +44,8 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
     Route::scopeBindings()->group(function () {
         Route::get('projects/{project}/discussions', [DiscussionController::class, 'index'])->name('projects.discussions.index');
         Route::get('projects/{project}/discussions/{discussion}', [DiscussionController::class, 'show'])->name('projects.discussions.show');
+        Route::get('projects/{project}/bugs', [BugController::class, 'index'])->name('projects.bugs.index');
+        Route::get('projects/{project}/bugs/{bug}', [BugController::class, 'show'])->name('projects.bugs.show');
     });
 
     Route::resource('projects', ProjectController::class)->only(['index', 'show', 'create', 'edit']);
@@ -75,6 +79,11 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
         Route::scopeBindings()->group(function () {
             Route::patch('projects/{project}/discussions/{discussion}/pin', [DiscussionController::class, 'togglePin'])->name('projects.discussions.togglePin');
             Route::post('projects/{project}/discussions/{discussion}/replies', [DiscussionController::class, 'storeReply'])->name('projects.discussions.replies.store');
+            Route::post('projects/{project}/bugs/ingest', [BugController::class, 'store'])->name('projects.bugs.store');
+            Route::patch('projects/{project}/bugs/{bug}/status', [BugController::class, 'updateStatus'])->name('projects.bugs.updateStatus');
+            Route::post('projects/{project}/bugs/{bug}/convert-to-task', [BugController::class, 'convertToTask'])->name('projects.bugs.convertToTask');
+            Route::post('projects/{project}/keys', [ProjectKeyController::class, 'store'])->name('projects.keys.store');
+            Route::delete('projects/{project}/keys', [ProjectKeyController::class, 'destroy'])->name('projects.keys.destroy');
         });
 
         Route::patch('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
@@ -109,6 +118,7 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
         Route::scopeBindings()->group(function () {
             Route::delete('projects/{project}/discussions/{discussion}', [DiscussionController::class, 'destroy'])->name('projects.discussions.destroy');
             Route::delete('projects/{project}/discussions/{discussion}/replies/{reply}', [DiscussionController::class, 'destroyReply'])->name('projects.discussions.replies.destroy');
+            Route::delete('projects/{project}/bugs/{bug}', [BugController::class, 'destroy'])->name('projects.bugs.destroy');
         });
     });
 });

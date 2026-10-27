@@ -18,6 +18,7 @@ This document tracks the completion status of every major feature and subsystem 
 | Security Hardening | ✅ Complete | 100% |
 | Deployment | 🚧 In Progress | 90% |
 | Email & Multi-Channel Notifications | 🚧 In Progress | 80% |
+| DevLoop Mini (Error Fingerprinting & Regressions) | ✅ Complete | 100% |
 | Integrations | 📋 Planned | 0% |
 
 ---
@@ -179,3 +180,25 @@ This document tracks the completion status of every major feature and subsystem 
 | Mark as read & mark all as read endpoints | ✅ |
 | Activity digest emails | 📋 Planned |
 | Outgoing webhooks | 📋 Planned |
+
+---
+
+## DevLoop Mini — Error Tracker & Regression Engine
+
+| Feature | Status |
+|---------|--------|
+| Volatile token normalization regex (UUIDs, hex pointers, line:col, integers) | ✅ |
+| Top-frame parser supporting V8/Node, Safari, and PHP stack traces | ✅ |
+| 16-hex deterministic SHA-1 fingerprinting service | ✅ |
+| Atomic upsert by `(project_id, fingerprint)` with occurrence counter | ✅ |
+| Autonomous regression detection: reopens `fixed` bugs to `open` on recurrence | ✅ |
+| Append-only immutable event timeline (`BugEvent` for crashes & status changes) | ✅ |
+| Explicit status transition state machine with optimistic concurrency locking | ✅ |
+| Headless ingest API with project-scoped 32-byte keys (`POST /api/v1/ingest`) | ✅ |
+| Project-level Ingest API key generation and rotation UI | ✅ |
+| Reporter SDK code generators for JavaScript, Laravel/PHP, and cURL | ✅ |
+| Project Bug list view with status filters, severity pills, and search | ✅ |
+| Bug detail view with full stack trace viewer and interactive timeline | ✅ |
+| "Convert Bug to Kanban Task" one-click bridge | ✅ |
+| Full Pest automated test coverage (unit + integration + authorization) | ✅ |
+

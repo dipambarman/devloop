@@ -78,4 +78,38 @@ class Project extends Model
     {
         return $this->hasMany(Discussion::class);
     }
+
+    public function bugs()
+    {
+        return $this->hasMany(Bug::class);
+    }
+
+    public function bugEvents()
+    {
+        return $this->hasMany(BugEvent::class);
+    }
+
+    /**
+     * Generate a new plaintext Ingest API key and save its SHA-256 hash.
+     * Returns the plaintext key (displayed only once).
+     */
+    public function generateIngestKey(): string
+    {
+        $plainKey = 'dl_ingest_' . bin2hex(random_bytes(24));
+        $this->forceFill([
+            'ingest_key_hash' => hash('sha256', $plainKey),
+        ])->save();
+
+        return $plainKey;
+    }
+
+    /**
+     * Revoke the current Ingest API key.
+     */
+    public function revokeIngestKey(): void
+    {
+        $this->forceFill([
+            'ingest_key_hash' => null,
+        ])->save();
+    }
 }
