@@ -58,3 +58,30 @@ test('password can be reset with valid token', function () {
         return true;
     });
 });
+
+test('password cannot be reset with an invalid token', function () {
+    $user = User::factory()->create();
+
+    $response = $this->post('/reset-password', [
+        'token' => 'invalid-token-12345',
+        'email' => $user->email,
+        'password' => 'newpassword123',
+        'password_confirmation' => 'newpassword123',
+    ]);
+
+    $response->assertSessionHasErrors(['email']);
+});
+
+test('password cannot be reset when confirmation does not match', function () {
+    $user = User::factory()->create();
+
+    $response = $this->post('/reset-password', [
+        'token' => 'any-token',
+        'email' => $user->email,
+        'password' => 'newpassword123',
+        'password_confirmation' => 'wrongconfirmation',
+    ]);
+
+    $response->assertSessionHasErrors(['password']);
+});
+

@@ -39,3 +39,64 @@ test('users can logout', function () {
     $this->assertGuest();
     $response->assertRedirect('/');
 });
+
+test('users can authenticate with remember me option', function () {
+    $user = User::factory()->create();
+
+    $response = $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+        'remember' => 'on',
+    ]);
+
+    $this->assertAuthenticatedAs($user);
+    $response->assertCookie(auth()->guard()->getRecallerName());
+});
+
+test('email is case insensitive during authentication', function () {
+    $user = User::factory()->create([
+        'email' => 'developer@devloop.app',
+    ]);
+
+    $response = $this->post('/login', [
+        'email' => 'DEVELOPER@DEVLOOP.APP',
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticatedAs($user);
+    $response->assertRedirect(route('dashboard', absolute: false));
+});
+
+test('login requests are rate limited after 5 failed attempts', function () {
+    $user = User::factory()->create();
+
+    for ($i = 0; $i < 5; $i++) {
+        $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ]);
+    }
+
+    $response = $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'wrong-password',
+    ]);
+
+    $response->assertStatus(429);
+});
+
+test('authenticated users are redirected away from login screen', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get('/login');
+
+    $response->assertRedirect(route('dashboard', absolute: false));
+});
+
+test('unverified users are redirected to verification notice from protected routes', function () {
+    $user = User::factory()->unverified()->create();
+
+    $response = $this->actingAs($user)->get('/dashboard');
+
+    $response->assertRedirect(route('verification.notice'));
+});

@@ -67,7 +67,7 @@ class SnippetController extends Controller
     {
         Gate::authorize('view', $snippet);
 
-        return view('snippets.show', compact('snippet'));
+        return redirect()->route('snippets.edit', $snippet);
     }
 
     /**

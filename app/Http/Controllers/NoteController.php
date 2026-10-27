@@ -55,7 +55,7 @@ class NoteController extends Controller
     {
         Gate::authorize('view', $note);
 
-        return view('notes.show', compact('note'));
+        return redirect()->route('notes.edit', $note);
     }
 
     /**
