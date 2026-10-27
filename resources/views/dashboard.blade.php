@@ -113,9 +113,7 @@
                                         @endif
                                     </div>
                                 </div>
-                                <x-badge :color="$project->status === 'active' ? 'success' : ($project->status === 'completed' ? 'primary' : 'gray')">
-                                    {{ ucfirst($project->status) }}
-                                </x-badge>
+                                <x-badge :value="$project->status" />
                             </a>
                         @endforeach
                     </div>
