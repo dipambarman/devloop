@@ -98,14 +98,18 @@ class NoteController extends Controller
     }
 
     /**
-     * Toggle the pinned status via AJAX.
+     * Toggle the pinned status via AJAX or standard form submission.
      */
-    public function togglePin(Note $note)
+    public function togglePin(Request $request, Note $note)
     {
         Gate::authorize('update', $note);
 
         $note->update(['is_pinned' => !$note->is_pinned]);
 
-        return response()->json(['success' => true, 'is_pinned' => $note->is_pinned]);
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'is_pinned' => $note->is_pinned]);
+        }
+
+        return redirect()->back()->with('success', $note->is_pinned ? 'Note pinned to top.' : 'Note unpinned.');
     }
 }
