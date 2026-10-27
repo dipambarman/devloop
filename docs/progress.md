@@ -17,7 +17,7 @@ This document tracks the completion status of every major feature and subsystem 
 | Dashboard & Analytics | ✅ Complete | 100% |
 | Security Hardening | ✅ Complete | 100% |
 | Deployment | 🚧 In Progress | 90% |
-| Email Notifications | 📋 Planned | 0% |
+| Email & Multi-Channel Notifications | 🚧 In Progress | 80% |
 | Integrations | 📋 Planned | 0% |
 
 ---
@@ -163,3 +163,19 @@ This document tracks the completion status of every major feature and subsystem 
 | Automated console schedule for backups & queues | ✅ |
 | Live Oracle Cloud VM instance execution | 📋 Next |
 | DuckDNS dynamic DNS & Let's Encrypt SSL setup | 📋 Next |
+
+---
+
+## Communication & Notifications
+
+| Feature | Status |
+|---------|--------|
+| Task assignment notifications (email + in-app) | ✅ |
+| Task comment notifications (email + in-app) | ✅ |
+| Discussion reply notifications (email + in-app) | ✅ |
+| Project invitation notifications (email + in-app) | ✅ |
+| Configurable user preferences (in-app vs email toggles) | ✅ |
+| Interactive notification dropdown with deep links | ✅ |
+| Mark as read & mark all as read endpoints | ✅ |
+| Activity digest emails | 📋 Planned |
+| Outgoing webhooks | 📋 Planned |

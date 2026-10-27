@@ -68,4 +68,32 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    /**
+     * Update user's notification preferences.
+     */
+    public function updateNotifications(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'preferences' => 'required|array',
+            'preferences.*.mail' => 'nullable|boolean',
+            'preferences.*.database' => 'nullable|boolean',
+        ]);
+
+        $sanitized = [];
+        $types = ['task_assigned', 'comment_added', 'discussion_replied', 'member_added'];
+
+        foreach ($types as $type) {
+            $sanitized[$type] = [
+                'mail' => (bool) ($validated['preferences'][$type]['mail'] ?? false),
+                'database' => (bool) ($validated['preferences'][$type]['database'] ?? false),
+            ];
+        }
+
+        $request->user()->update([
+            'notification_preferences' => $sanitized,
+        ]);
+
+        return Redirect::route('profile.edit')->with('status', 'notifications-updated');
+    }
 }

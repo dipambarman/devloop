@@ -14,6 +14,10 @@
             <x-card>
                 @include('profile.partials.update-password-form')
             </x-card>
+
+            <x-card>
+                @include('profile.partials.update-notification-preferences-form')
+            </x-card>
         </div>
 
         <div class="space-y-6">

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'bio', 'skills', 'github_url', 'portfolio_url', 'linkedin_url'])]
+#[Fillable(['name', 'email', 'password', 'bio', 'skills', 'github_url', 'portfolio_url', 'linkedin_url', 'notification_preferences'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -28,7 +28,42 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'skills' => 'array',
+            'notification_preferences' => 'array',
         ];
+    }
+
+    /**
+     * Default notification preferences configuration.
+     */
+    public static function defaultNotificationPreferences(): array
+    {
+        return [
+            'task_assigned' => ['mail' => true, 'database' => true],
+            'comment_added' => ['mail' => true, 'database' => true],
+            'discussion_replied' => ['mail' => true, 'database' => true],
+            'member_added' => ['mail' => true, 'database' => true],
+        ];
+    }
+
+    /**
+     * Get user's active notification preferences merged with defaults.
+     */
+    public function getNotificationPreferences(): array
+    {
+        $defaults = self::defaultNotificationPreferences();
+        $stored = $this->notification_preferences ?? [];
+
+        return array_replace_recursive($defaults, $stored);
+    }
+
+    /**
+     * Check if user wants a specific notification via a specific channel ('mail' or 'database').
+     */
+    public function wantsNotification(string $type, string $channel): bool
+    {
+        $prefs = $this->getNotificationPreferences();
+
+        return !empty($prefs[$type][$channel]);
     }
 
     public function projects()

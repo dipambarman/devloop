@@ -38,6 +38,26 @@ class AppServiceProvider extends ServiceProvider
             \App\Listeners\LogActivityListener::class,
         );
 
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\TaskAssigneeChanged::class,
+            \App\Listeners\SendTaskAssignedNotification::class,
+        );
+
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\CommentAdded::class,
+            \App\Listeners\SendCommentNotification::class,
+        );
+
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\DiscussionReplyAdded::class,
+            \App\Listeners\SendDiscussionReplyNotification::class,
+        );
+
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\MemberAdded::class,
+            \App\Listeners\SendMemberAddedNotification::class,
+        );
+
         // ── Tiered Rate Limiters ─────────────────────────────────
         // Global: baseline protection for all authenticated routes.
         RateLimiter::for('global', function (Request $request) {

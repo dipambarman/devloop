@@ -56,16 +56,22 @@
 
                 <div class="max-h-[300px] overflow-y-auto">
                     @forelse(auth()->user()->unreadNotifications as $notification)
-                        <div class="px-4 py-3 border-b border-border hover:bg-surface-hover transition-colors">
+                        <div class="px-4 py-3 border-b border-border hover:bg-surface-hover transition-colors group">
                             <div class="flex justify-between items-start gap-2">
                                 <div class="flex-1">
-                                    <p class="text-sm text-primary-text">{{ $notification->data['message'] ?? 'New notification' }}</p>
+                                    @if(!empty($notification->data['url']))
+                                        <a href="{{ $notification->data['url'] }}" class="text-sm font-medium text-primary-text hover:text-primary transition-colors block">
+                                            {{ $notification->data['message'] ?? 'New notification' }}
+                                        </a>
+                                    @else
+                                        <p class="text-sm text-primary-text">{{ $notification->data['message'] ?? 'New notification' }}</p>
+                                    @endif
                                     <p class="text-xs text-secondary-text mt-1">{{ $notification->created_at->diffForHumans() }}</p>
                                 </div>
                                 <form action="{{ route('notifications.read', $notification->id) }}" method="POST">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="text-xs text-secondary-text hover:text-primary transition-colors" title="Mark as read">
+                                    <button type="submit" class="p-1 rounded text-secondary-text hover:text-primary hover:bg-surface transition-colors" title="Mark as read">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>

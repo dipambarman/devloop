@@ -50,6 +50,7 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
     // State-changing operations: update, patch, post.
     Route::middleware('throttle:write')->group(function () {
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::patch('/profile/notifications', [ProfileController::class, 'updateNotifications'])->name('profile.notifications.update');
 
         Route::resource('projects', ProjectController::class)->only(['update']);
         Route::post('projects/{project}/members', [ProjectController::class, 'addMember'])->name('projects.addMember');

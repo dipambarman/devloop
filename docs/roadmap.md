@@ -80,13 +80,16 @@ Preparing the application for production hosting and public launch.
 - [ ] DuckDNS dynamic DNS setup (`devloop.duckdns.org`)
 - [ ] Free SSL certificate via Let's Encrypt / Certbot
 
-### Phase 6: Communication & Notifications 📋
+### Phase 6: Communication & Notifications 🚧
 
-Expanding the notification system beyond in-app alerts.
+Expanding the notification system with event-driven alerts and user preferences.
 
-- [ ] Email notifications for task assignments
-- [ ] Email notifications for discussion replies and mentions
-- [ ] Configurable notification preferences per user
+- [x] Multi-channel notifications for task assignments (`TaskAssignedNotification`)
+- [x] Multi-channel notifications for discussion replies (`DiscussionRepliedNotification`)
+- [x] Multi-channel notifications for task comments (`CommentAddedNotification`)
+- [x] Multi-channel notifications for project invitations (`MemberAddedNotification`)
+- [x] Configurable notification preferences per user (in-app vs email toggles in profile)
+- [x] Interactive notification dropdown with deep links to tasks, discussions & projects
 - [ ] Digest emails (daily/weekly summary of project activity)
 - [ ] Webhook support for external integrations
 
