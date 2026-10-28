@@ -1,7 +1,6 @@
 <?php
 
 use App\Enums\TaskPriority;
-use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;

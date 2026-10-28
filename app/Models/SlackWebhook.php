@@ -53,7 +53,7 @@ class SlackWebhook extends Model
      */
     public function subscribesTo(string $event): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 

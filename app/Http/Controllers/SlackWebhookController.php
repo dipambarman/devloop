@@ -63,7 +63,7 @@ class SlackWebhookController extends Controller
 
         $slackWebhook->update($validated);
 
-        return back()->with('success', "Slack webhook updated.");
+        return back()->with('success', 'Slack webhook updated.');
     }
 
     /**
@@ -99,6 +99,6 @@ class SlackWebhookController extends Controller
 
         $slackWebhook->delete();
 
-        return back()->with('success', "Slack webhook removed.");
+        return back()->with('success', 'Slack webhook removed.');
     }
 }

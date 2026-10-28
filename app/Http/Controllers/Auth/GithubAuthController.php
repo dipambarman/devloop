@@ -55,7 +55,7 @@ class GithubAuthController extends Controller
         try {
             $githubUser = Socialite::driver('github')->user();
         } catch (\Throwable $e) {
-            Log::warning('GitHub OAuth authentication cancelled or failed: ' . $e->getMessage());
+            Log::warning('GitHub OAuth authentication cancelled or failed: '.$e->getMessage());
 
             return redirect()->route('login')->withErrors([
                 'oauth' => 'GitHub authentication was cancelled or failed. Please try again.',
@@ -76,11 +76,11 @@ class GithubAuthController extends Controller
         // Query by github_id first, then by email
         $user = User::where('github_id', $githubId)->first();
 
-        if (!$user && $email) {
+        if (! $user && $email) {
             $user = User::where('email', $email)->first();
         }
 
-        if (!$user) {
+        if (! $user) {
             // Register brand-new developer via GitHub
             $user = User::create([
                 'name' => $name,

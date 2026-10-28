@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
+use App\Models\Project;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -16,12 +17,12 @@ class StoreTaskRequest extends FormRequest
     public function authorize(): bool
     {
         $projectId = $this->input('project_id');
-        if (!$projectId) {
+        if (! $projectId) {
             return false;
         }
 
-        $project = \App\Models\Project::find($projectId);
-        if (!$project) {
+        $project = Project::find($projectId);
+        if (! $project) {
             return false;
         }
 

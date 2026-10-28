@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Project;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreNoteRequest extends FormRequest
@@ -9,7 +10,8 @@ class StoreNoteRequest extends FormRequest
     public function authorize(): bool
     {
         if ($projectId = $this->input('project_id')) {
-            $project = \App\Models\Project::find($projectId);
+            $project = Project::find($projectId);
+
             return $project && $project->isAccessibleBy($this->user());
         }
 

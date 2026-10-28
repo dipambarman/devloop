@@ -5,6 +5,7 @@ namespace App\Events;
 use App\Models\Discussion;
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 class DiscussionCreated extends ProjectActivityEvent
 {
@@ -21,7 +22,7 @@ class DiscussionCreated extends ProjectActivityEvent
         return 'discussion_created';
     }
 
-    public function subject(): \Illuminate\Database\Eloquent\Model
+    public function subject(): Model
     {
         return $this->discussion;
     }

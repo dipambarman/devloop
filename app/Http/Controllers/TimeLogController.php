@@ -71,14 +71,14 @@ class TimeLogController extends Controller
     {
         Gate::authorize('view', $project);
 
-        $timeLogs = TimeLog::whereHas('task', fn($q) => $q->where('project_id', $project->id))
+        $timeLogs = TimeLog::whereHas('task', fn ($q) => $q->where('project_id', $project->id))
             ->with(['user', 'task'])
             ->latest('logged_at')
             ->latest('id')
             ->paginate(25);
 
         // Summary metrics by user
-        $userSummaries = TimeLog::whereHas('task', fn($q) => $q->where('project_id', $project->id))
+        $userSummaries = TimeLog::whereHas('task', fn ($q) => $q->where('project_id', $project->id))
             ->join('users', 'time_logs.user_id', '=', 'users.id')
             ->selectRaw('users.id, users.name, SUM(time_logs.duration_minutes) as total_minutes')
             ->groupBy('users.id', 'users.name')

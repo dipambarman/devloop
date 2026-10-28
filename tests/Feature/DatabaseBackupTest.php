@@ -44,7 +44,7 @@ test('db:backup accepts custom filename', function () {
     $this->artisan('db:backup --filename=pre-deploy-snapshot.sql.gz')
         ->assertSuccessful();
 
-    $targetFile = $this->backupDir . DIRECTORY_SEPARATOR . 'pre-deploy-snapshot.sql.gz';
+    $targetFile = $this->backupDir.DIRECTORY_SEPARATOR.'pre-deploy-snapshot.sql.gz';
     expect(File::exists($targetFile))->toBeTrue();
 });
 
@@ -57,12 +57,12 @@ test('db:backup list displays archives', function () {
 });
 
 test('db:backup removes archives exceeding retention days', function () {
-    $oldFile = $this->backupDir . DIRECTORY_SEPARATOR . 'devloop-backup-old.sql.gz';
+    $oldFile = $this->backupDir.DIRECTORY_SEPARATOR.'devloop-backup-old.sql.gz';
     File::put($oldFile, 'fake archive data');
     // Set modification time to 10 days ago
     touch($oldFile, now()->subDays(10)->timestamp);
 
-    $freshFile = $this->backupDir . DIRECTORY_SEPARATOR . 'devloop-backup-fresh.sql.gz';
+    $freshFile = $this->backupDir.DIRECTORY_SEPARATOR.'devloop-backup-fresh.sql.gz';
     File::put($freshFile, 'fresh archive data');
     touch($freshFile, now()->subDays(2)->timestamp);
 

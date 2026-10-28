@@ -1,7 +1,6 @@
 <?php
 
 use App\Jobs\SendSlackWebhookJob;
-use App\Models\Bug;
 use App\Models\Project;
 use App\Models\SlackWebhook;
 use App\Models\User;
@@ -152,12 +151,12 @@ test('automatic regression detection dispatches slack webhook regression alert',
     ]);
 
     $ingestService = app(BugIngestService::class);
-    
+
     // Ingest first time
     $bug = $ingestService->ingest(
         project: $project,
         message: 'DivisionByZeroError: Attempted division by zero in metrics.php',
-        stack: "at calculateRatio (metrics.php:12:3)",
+        stack: 'at calculateRatio (metrics.php:12:3)',
         severity: 'critical',
         environment: 'production'
     );
@@ -169,7 +168,7 @@ test('automatic regression detection dispatches slack webhook regression alert',
     $ingestService->ingest(
         project: $project,
         message: 'DivisionByZeroError: Attempted division by zero in metrics.php',
-        stack: "at calculateRatio (metrics.php:12:3)",
+        stack: 'at calculateRatio (metrics.php:12:3)',
         severity: 'critical',
         environment: 'production'
     );

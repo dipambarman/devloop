@@ -6,6 +6,7 @@ use App\Models\Comment;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 class CommentAdded extends ProjectActivityEvent
 {
@@ -23,7 +24,7 @@ class CommentAdded extends ProjectActivityEvent
         return 'comment_added';
     }
 
-    public function subject(): \Illuminate\Database\Eloquent\Model
+    public function subject(): Model
     {
         return $this->comment;
     }

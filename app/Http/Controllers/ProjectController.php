@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ProjectRole;
+use App\Enums\SprintStatus;
 use App\Enums\TaskStatus;
-use App\Models\Project;
-use App\Models\User;
+use App\Events\MemberAdded;
+use App\Events\MemberRemoved;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
@@ -75,7 +78,7 @@ class ProjectController extends Controller
             $search = $request->search;
             $tasksQuery->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -84,7 +87,7 @@ class ProjectController extends Controller
         }
 
         $priorityFilter = $request->input('priority') ?? $request->input('severity');
-        if (!empty($priorityFilter)) {
+        if (! empty($priorityFilter)) {
             $tasksQuery->where('priority', $priorityFilter);
         }
 
@@ -102,13 +105,13 @@ class ProjectController extends Controller
     /**
      * Display the Kanban board for the project with sprint filtering.
      */
-    public function board(\Illuminate\Http\Request $request, Project $project)
+    public function board(Request $request, Project $project)
     {
         Gate::authorize('view', $project);
 
         $sprintFilter = $request->query('sprint', 'all');
         $sprints = $project->sprints()->latest('created_at')->get();
-        $activeSprint = $project->sprints()->where('status', \App\Enums\SprintStatus::Active)->first();
+        $activeSprint = $project->sprints()->where('status', SprintStatus::Active)->first();
 
         $query = $project->tasks()->with(['assignee', 'tags', 'sprint'])->withCount('comments')->orderBy('order_column')->latest();
 
@@ -197,7 +200,7 @@ class ProjectController extends Controller
             ->orWhere('github_username', $cleanUsername)
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             $errorMessage = (str_contains($identifier, '@') && str_contains($identifier, '.'))
                 ? 'No user found with that email address.'
                 : "No user found with email or GitHub username '{$identifier}'.";
@@ -216,7 +219,7 @@ class ProjectController extends Controller
         $role = ProjectRole::from($request->role);
         $project->members()->attach($user->id, ['role' => $role->value]);
 
-        \App\Events\MemberAdded::dispatch($project, auth()->user(), $user, $role);
+        MemberAdded::dispatch($project, auth()->user(), $user, $role);
 
         return redirect()->back()->with('success', "{$user->name} has been added to the project!");
     }
@@ -234,9 +237,8 @@ class ProjectController extends Controller
 
         $project->members()->detach($user->id);
 
-        \App\Events\MemberRemoved::dispatch($project, auth()->user(), $user);
+        MemberRemoved::dispatch($project, auth()->user(), $user);
 
         return redirect()->back()->with('success', "{$user->name} has been removed from the project.");
     }
 }
-

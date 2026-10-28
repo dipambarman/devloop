@@ -6,6 +6,7 @@ use App\Models\Bug;
 use App\Models\BugEvent;
 use App\Models\Project;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BugIngestService
 {
@@ -136,14 +137,14 @@ class BugIngestService
                     'url' => $url,
                     'handled' => $handled,
                     'context' => $cleanContext,
-                ], fn ($val) => !is_null($val));
+                ], fn ($val) => ! is_null($val));
 
                 BugEvent::create([
                     'bug_id' => $bug->id,
                     'project_id' => $project->id,
                     'type' => 'occurrence',
                     'occurrence_count' => $bug->occurrence_count,
-                    'metadata' => !empty($eventMetadata) ? $eventMetadata : null,
+                    'metadata' => ! empty($eventMetadata) ? $eventMetadata : null,
                     'created_at' => $now,
                 ]);
             }
@@ -162,7 +163,7 @@ class BugIngestService
             }
         } catch (\Throwable $e) {
             // Webhook alert dispatching should never abort ingest
-            \Illuminate\Support\Facades\Log::warning('Slack webhook dispatch failed during ingest: ' . $e->getMessage());
+            Log::warning('Slack webhook dispatch failed during ingest: '.$e->getMessage());
         }
 
         return $bug;
@@ -208,6 +209,7 @@ class BugIngestService
         foreach ($data as $key => $value) {
             if (is_string($key) && preg_match($sensitiveKeyRegex, $key)) {
                 $cleaned[$key] = '[REDACTED]';
+
                 continue;
             }
 

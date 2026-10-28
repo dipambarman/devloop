@@ -6,6 +6,7 @@ use App\Models\Discussion;
 use App\Models\DiscussionReply;
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 class DiscussionReplyAdded extends ProjectActivityEvent
 {
@@ -23,7 +24,7 @@ class DiscussionReplyAdded extends ProjectActivityEvent
         return 'discussion_reply';
     }
 
-    public function subject(): \Illuminate\Database\Eloquent\Model
+    public function subject(): Model
     {
         return $this->reply;
     }

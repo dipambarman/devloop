@@ -6,6 +6,7 @@ use App\Enums\TaskPriority;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 class TaskPriorityChanged extends ProjectActivityEvent
 {
@@ -27,7 +28,7 @@ class TaskPriorityChanged extends ProjectActivityEvent
         return 'priority_changed';
     }
 
-    public function subject(): \Illuminate\Database\Eloquent\Model
+    public function subject(): Model
     {
         return $this->task;
     }

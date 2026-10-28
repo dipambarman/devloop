@@ -73,7 +73,7 @@ class DiscussionController extends Controller
         Gate::authorize('update', $project);
 
         $discussion->update([
-            'is_pinned' => !$discussion->is_pinned,
+            'is_pinned' => ! $discussion->is_pinned,
         ]);
 
         return redirect()->back()->with('success', $discussion->is_pinned ? 'Discussion pinned.' : 'Discussion unpinned.');

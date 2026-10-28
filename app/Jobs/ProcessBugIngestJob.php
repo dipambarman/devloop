@@ -17,6 +17,7 @@ class ProcessBugIngestJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 3;
+
     public int $backoff = 5;
 
     public function __construct(
@@ -31,20 +32,22 @@ class ProcessBugIngestJob implements ShouldQueue
     {
         $project = Project::find($this->projectId);
 
-        if (!$project) {
+        if (! $project) {
             Log::warning("ProcessBugIngestJob skipped: Project #{$this->projectId} not found or deleted.");
+
             return;
         }
 
         // Check if this is a batch payload
         if (isset($this->payload['events']) && is_array($this->payload['events'])) {
             foreach ($this->payload['events'] as $event) {
-                if (!is_array($event) || empty($event['message'])) {
+                if (! is_array($event) || empty($event['message'])) {
                     continue;
                 }
 
                 $this->processSingleEvent($ingestService, $project, $event);
             }
+
             return;
         }
 
@@ -61,12 +64,12 @@ class ProcessBugIngestJob implements ShouldQueue
             $ingestService->ingest(
                 project: $project,
                 message: (string) ($event['message'] ?? 'Unhandled Error'),
-                stack: !empty($event['stack']) ? (string) $event['stack'] : null,
+                stack: ! empty($event['stack']) ? (string) $event['stack'] : null,
                 severity: (string) ($event['severity'] ?? 'medium'),
                 environment: (string) ($event['environment'] ?? 'production'),
-                url: !empty($event['url']) ? (string) $event['url'] : null,
-                userAgent: !empty($event['user_agent']) ? (string) $event['user_agent'] : null,
-                context: !empty($event['context']) && is_array($event['context']) ? $event['context'] : null,
+                url: ! empty($event['url']) ? (string) $event['url'] : null,
+                userAgent: ! empty($event['user_agent']) ? (string) $event['user_agent'] : null,
+                context: ! empty($event['context']) && is_array($event['context']) ? $event['context'] : null,
                 handled: (bool) ($event['handled'] ?? false)
             );
         } catch (Throwable $e) {

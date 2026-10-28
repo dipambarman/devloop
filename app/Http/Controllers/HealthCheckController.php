@@ -20,8 +20,8 @@ class HealthCheckController extends Controller
         $configuredToken = config('services.health.token');
         $providedToken = $request->header('X-Health-Token', $request->query('token'));
 
-        $isAuthorizedForDetails = empty($configuredToken) 
-            ? $request->boolean('full') 
+        $isAuthorizedForDetails = empty($configuredToken)
+            ? $request->boolean('full')
             : ($providedToken === $configuredToken);
 
         $result = $this->healthCheckService->check($isAuthorizedForDetails);

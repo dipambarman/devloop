@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CommentAdded;
 use App\Models\Comment;
 use App\Models\Task;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class CommentController extends Controller
             'content' => $request->content,
         ]);
 
-        \App\Events\CommentAdded::dispatch($task->project, auth()->user(), $task, $comment);
+        CommentAdded::dispatch($task->project, auth()->user(), $task, $comment);
 
         return redirect()->back()->with('success', 'Comment added successfully.');
     }

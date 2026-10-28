@@ -1,7 +1,6 @@
 <?php
 
 use App\Enums\MilestoneStatus;
-use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Models\Milestone;
 use App\Models\Project;
@@ -9,6 +8,7 @@ use App\Models\Task;
 use App\Models\TimeLog;
 use App\Models\User;
 use App\Services\TaskDependencyService;
+use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
     $this->owner = User::factory()->create();
@@ -261,8 +261,8 @@ it('prevents self dependency and cross-project dependency', function () {
 
     // Cross-project check at domain service level throws ValidationException
     $service = app(TaskDependencyService::class);
-    expect(fn() => $service->addDependency($taskA, $taskOther))
-        ->toThrow(\Illuminate\Validation\ValidationException::class);
+    expect(fn () => $service->addDependency($taskA, $taskOther))
+        ->toThrow(ValidationException::class);
 });
 
 it('detects and prevents circular dependency loops in O(V + E)', function () {

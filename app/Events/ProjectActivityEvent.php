@@ -4,6 +4,7 @@ namespace App\Events;
 
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -26,7 +27,7 @@ abstract class ProjectActivityEvent
     /**
      * The subject model (polymorphic).
      */
-    public function subject(): ?\Illuminate\Database\Eloquent\Model
+    public function subject(): ?Model
     {
         return null;
     }

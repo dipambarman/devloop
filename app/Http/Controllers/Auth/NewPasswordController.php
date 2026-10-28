@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -53,7 +54,7 @@ class NewPasswordController extends Controller
                 // Destroy all existing sessions for this user.
                 // The user likely reset because their account was compromised.
                 if ($user->getAuthIdentifier()) {
-                    \Illuminate\Support\Facades\DB::table('sessions')
+                    DB::table('sessions')
                         ->where('user_id', $user->getAuthIdentifier())
                         ->delete();
                 }

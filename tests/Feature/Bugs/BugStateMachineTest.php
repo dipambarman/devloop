@@ -25,7 +25,7 @@ beforeEach(function () {
 });
 
 it('allows legal status transitions through the state machine', function () {
-    $stateMachine = new BugStateMachine();
+    $stateMachine = new BugStateMachine;
 
     // open -> in_progress
     $bug = $stateMachine->transition($this->bug, 'in_progress', $this->user, 0);
@@ -44,7 +44,7 @@ it('allows legal status transitions through the state machine', function () {
 });
 
 it('rejects illegal status transitions', function () {
-    $stateMachine = new BugStateMachine();
+    $stateMachine = new BugStateMachine;
 
     // Set status to fixed
     $this->bug->status = 'fixed';
@@ -55,7 +55,7 @@ it('rejects illegal status transitions', function () {
 })->throws(ValidationException::class);
 
 it('detects concurrent edits and raises ConflictHttpException on stale version', function () {
-    $stateMachine = new BugStateMachine();
+    $stateMachine = new BugStateMachine;
 
     // Someone else already changed the bug (version incremented to 1)
     $this->bug->version = 1;
@@ -67,7 +67,7 @@ it('detects concurrent edits and raises ConflictHttpException on stale version',
 
 it('converts a bug into an actionable Kanban task', function () {
     $response = $this->actingAs($this->user)
-                     ->post(route('projects.bugs.convertToTask', [$this->project, $this->bug]));
+        ->post(route('projects.bugs.convertToTask', [$this->project, $this->bug]));
 
     $response->assertRedirect();
 

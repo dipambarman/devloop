@@ -123,7 +123,7 @@ class MilestoneController extends Controller
             'milestone_id' => ['nullable', 'exists:milestones,id'],
         ]);
 
-        if (!empty($validated['milestone_id'])) {
+        if (! empty($validated['milestone_id'])) {
             $milestone = $project->milestones()->findOrFail($validated['milestone_id']);
             $task->milestone_id = $milestone->id;
         } else {

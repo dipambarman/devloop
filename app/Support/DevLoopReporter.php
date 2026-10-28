@@ -9,7 +9,9 @@ use Throwable;
 class DevLoopReporter
 {
     protected static ?string $apiKey = null;
+
     protected static ?string $endpoint = null;
+
     protected static ?string $environment = null;
 
     /**
@@ -56,13 +58,13 @@ class DevLoopReporter
             $mergedContext = array_merge($userContext, $context);
 
             $payload = [
-                'message' => get_class($e) . ': ' . $e->getMessage(),
+                'message' => get_class($e).': '.$e->getMessage(),
                 'stack' => $e->getTraceAsString(),
                 'severity' => in_array($severity, ['low', 'medium', 'high', 'critical']) ? $severity : 'critical',
                 'environment' => $env,
                 'url' => $requestUrl,
                 'user_agent' => $userAgent,
-                'context' => !empty($mergedContext) ? $mergedContext : null,
+                'context' => ! empty($mergedContext) ? $mergedContext : null,
                 'handled' => false,
             ];
 
@@ -71,13 +73,14 @@ class DevLoopReporter
                 'X-DevLoop-Async' => '1',
                 'Accept' => 'application/json',
             ])
-            ->timeout(2)
-            ->post($url, $payload);
+                ->timeout(2)
+                ->post($url, $payload);
 
             return $response->successful();
         } catch (Throwable $reportError) {
             // Failsafe: Never allow error tracking to cause secondary application crashes
-            Log::debug('DevLoopReporter failed to dispatch error payload: ' . $reportError->getMessage());
+            Log::debug('DevLoopReporter failed to dispatch error payload: '.$reportError->getMessage());
+
             return false;
         }
     }
@@ -103,12 +106,12 @@ class DevLoopReporter
 
             $payload = [
                 'message' => $message,
-                'stack' => (new \Exception())->getTraceAsString(),
+                'stack' => (new \Exception)->getTraceAsString(),
                 'severity' => in_array($severity, ['low', 'medium', 'high', 'critical']) ? $severity : 'medium',
                 'environment' => $env,
                 'url' => function_exists('request') && request() ? request()->fullUrl() : null,
                 'user_agent' => function_exists('request') && request() ? request()->userAgent() : null,
-                'context' => !empty($context) ? $context : null,
+                'context' => ! empty($context) ? $context : null,
                 'handled' => true,
             ];
 
@@ -117,12 +120,13 @@ class DevLoopReporter
                 'X-DevLoop-Async' => '1',
                 'Accept' => 'application/json',
             ])
-            ->timeout(2)
-            ->post($url, $payload);
+                ->timeout(2)
+                ->post($url, $payload);
 
             return $response->successful();
         } catch (Throwable $reportError) {
-            Log::debug('DevLoopReporter failed to dispatch message payload: ' . $reportError->getMessage());
+            Log::debug('DevLoopReporter failed to dispatch message payload: '.$reportError->getMessage());
+
             return false;
         }
     }

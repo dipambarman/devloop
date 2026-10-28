@@ -5,15 +5,17 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscussionController;
+use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\MilestoneController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\MilestoneController;
+use App\Http\Controllers\ProjectExportController;
 use App\Http\Controllers\ProjectKeyController;
+use App\Http\Controllers\SlackWebhookController;
 use App\Http\Controllers\SnippetController;
 use App\Http\Controllers\SprintController;
-use App\Http\Controllers\SlackWebhookController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskDependencyController;
 use App\Http\Controllers\TimeLogController;
@@ -26,8 +28,8 @@ Route::get('/', function () {
 Route::view('/changelog', 'changelog')->name('changelog');
 
 // System Health & Monitoring Probe
-Route::get('/health', \App\Http\Controllers\HealthCheckController::class)->name('health');
-Route::get('/api/health', \App\Http\Controllers\HealthCheckController::class)->name('api.health');
+Route::get('/health', HealthCheckController::class)->name('health');
+Route::get('/api/health', HealthCheckController::class)->name('api.health');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -54,6 +56,8 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
         Route::get('projects/{project}/sprints', [SprintController::class, 'index'])->name('projects.sprints.index');
         Route::get('projects/{project}/milestones', [MilestoneController::class, 'index'])->name('projects.milestones.index');
         Route::get('projects/{project}/time-report', [TimeLogController::class, 'report'])->name('projects.time-report');
+        Route::get('projects/{project}/export/tasks', [ProjectExportController::class, 'exportTasks'])->name('projects.export.tasks');
+        Route::get('projects/{project}/export/errors', [ProjectExportController::class, 'exportErrors'])->name('projects.export.errors');
     });
 
     Route::resource('projects', ProjectController::class)->only(['index', 'show', 'create', 'edit']);

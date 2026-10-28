@@ -74,7 +74,7 @@ class Milestone extends Model
 
     public function isOverdue(): bool
     {
-        if (!$this->due_date || $this->isClosed()) {
+        if (! $this->due_date || $this->isClosed()) {
             return false;
         }
 

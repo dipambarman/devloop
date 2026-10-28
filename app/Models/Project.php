@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use App\Enums\ProjectStatus;
+use App\Enums\SprintStatus;
+use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProjectFactory> */
+    /** @use HasFactory<ProjectFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
@@ -19,6 +21,7 @@ class Project extends Model
         'status',
         'color',
         'github_repo',
+        'github_webhook_secret',
     ];
 
     protected $casts = [
@@ -36,8 +39,8 @@ class Project extends Model
     public function members()
     {
         return $this->belongsToMany(User::class, 'project_user')
-                    ->withPivot('role')
-                    ->withTimestamps();
+            ->withPivot('role')
+            ->withTimestamps();
     }
 
     /**
@@ -61,6 +64,7 @@ class Project extends Model
         $member = $this->members()->where('user_id', $user->id)->first();
         if ($member) {
             $role = $member->pivot->role ?? 'member';
+
             return $role !== 'viewer';
         }
 
@@ -114,7 +118,7 @@ class Project extends Model
 
     public function activeSprint()
     {
-        return $this->hasOne(Sprint::class)->where('status', \App\Enums\SprintStatus::Active);
+        return $this->hasOne(Sprint::class)->where('status', SprintStatus::Active);
     }
 
     public function milestones()
@@ -129,7 +133,7 @@ class Project extends Model
 
     public function totalLoggedHours(): float
     {
-        $minutes = TimeLog::whereHas('task', fn($q) => $q->where('project_id', $this->id))
+        $minutes = TimeLog::whereHas('task', fn ($q) => $q->where('project_id', $this->id))
             ->sum('duration_minutes');
 
         return round($minutes / 60, 2);
@@ -141,7 +145,7 @@ class Project extends Model
      */
     public function generateIngestKey(): string
     {
-        $plainKey = 'dl_ingest_' . bin2hex(random_bytes(24));
+        $plainKey = 'dl_ingest_'.bin2hex(random_bytes(24));
         $this->forceFill([
             'ingest_key_hash' => hash('sha256', $plainKey),
         ])->save();
@@ -157,5 +161,20 @@ class Project extends Model
         $this->forceFill([
             'ingest_key_hash' => null,
         ])->save();
+    }
+
+    /**
+     * Get or generate a GitHub webhook secret for this project.
+     */
+    public function getWebhookSecret(): string
+    {
+        if (empty($this->github_webhook_secret)) {
+            $secret = bin2hex(random_bytes(16));
+            $this->updateQuietly(['github_webhook_secret' => $secret]);
+
+            return $secret;
+        }
+
+        return $this->github_webhook_secret;
     }
 }

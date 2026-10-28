@@ -76,7 +76,7 @@ class Sprint extends Model
 
     public function daysRemaining(): ?int
     {
-        if (!$this->end_date) {
+        if (! $this->end_date) {
             return null;
         }
 

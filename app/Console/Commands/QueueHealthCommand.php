@@ -33,8 +33,9 @@ class QueueHealthCommand extends Command
         $queueDriver = config('queue.default');
         $this->info("Queue Driver: [{$queueDriver}]");
 
-        if (!Schema::hasTable('failed_jobs')) {
+        if (! Schema::hasTable('failed_jobs')) {
             $this->warn("Table 'failed_jobs' does not exist in the database.");
+
             return Command::SUCCESS;
         }
 
@@ -67,17 +68,19 @@ class QueueHealthCommand extends Command
             }
 
             $this->newLine();
-            $this->line("<comment>Recent Failed Jobs:</comment>");
+            $this->line('<comment>Recent Failed Jobs:</comment>');
             $this->table(['ID', 'Queue', 'Failed At', 'Exception'], $rows);
         }
 
         $maxFailed = (int) $this->option('max-failed');
         if ($failedCount >= $maxFailed) {
             $this->error("Alert: Failed jobs count ({$failedCount}) reached or exceeded threshold ({$maxFailed})!");
+
             return Command::FAILURE;
         }
 
         $this->info("Queue health is normal. Failed jobs ({$failedCount}) within threshold ({$maxFailed}).");
+
         return Command::SUCCESS;
     }
 }

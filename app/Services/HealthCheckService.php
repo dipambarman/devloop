@@ -29,7 +29,7 @@ class HealthCheckService
         $status = 'healthy';
         $httpCode = 200;
 
-        if (!$isDbHealthy) {
+        if (! $isDbHealthy) {
             $status = 'unhealthy';
             $httpCode = 503;
         } elseif ($isDegraded) {
@@ -80,7 +80,7 @@ class HealthCheckService
         } catch (Exception $e) {
             return [
                 'status' => 'unhealthy',
-                'error' => 'Database connection failed: ' . $e->getMessage(),
+                'error' => 'Database connection failed: '.$e->getMessage(),
             ];
         }
     }
@@ -91,7 +91,7 @@ class HealthCheckService
     public function checkCache(): array
     {
         $start = microtime(true);
-        $key = '_health_check_' . uniqid();
+        $key = '_health_check_'.uniqid();
 
         try {
             Cache::put($key, 'ok', 10);
@@ -115,7 +115,7 @@ class HealthCheckService
         } catch (Exception $e) {
             return [
                 'status' => 'degraded',
-                'error' => 'Cache connection failed: ' . $e->getMessage(),
+                'error' => 'Cache connection failed: '.$e->getMessage(),
             ];
         }
     }
@@ -163,7 +163,7 @@ class HealthCheckService
     public function checkQueue(): array
     {
         try {
-            if (!Schema::hasTable('failed_jobs')) {
+            if (! Schema::hasTable('failed_jobs')) {
                 return [
                     'status' => 'ok',
                     'failed_jobs_count' => 0,

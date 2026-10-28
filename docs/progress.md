@@ -301,5 +301,21 @@ This document tracks the completion status of every major feature and subsystem 
 | One-click "Share Link" clipboard copy button for rapid team onboarding | ✅ |
 | Brand logo featuring Bug Hunt monitor emblem across landing, guest, and navbar | ✅ |
 
+---
 
+## GitHub Webhook Auto-Sync & Project Data Export
 
+| Feature | Status |
+|---------|--------|
+| GitHub push webhook processing (`POST /api/webhooks/github`, `POST /api/projects/{project}/webhooks/github`) | ✅ |
+| Auto-resolve tasks via commit message syntax (`Fixes #12`, `Closes #12`, `Resolves #12`) | ✅ |
+| GitHub merged PR event handling (automatically closes referenced tasks and links PR) | ✅ |
+| Automatic task comment and polymorphic activity log generation upon commit/PR sync | ✅ |
+| Cryptographic HMAC-SHA256 signature verification (`X-Hub-Signature-256`) with project secrets | ✅ |
+| Streamed CSV Task Export with UTF-8 BOM Excel compatibility (`/projects/{project}/export/tasks`) | ✅ |
+| Structured JSON Task Export with assignees, tags, and timestamps | ✅ |
+| Streamed CSV and JSON Error Logs Export (`/projects/{project}/export/errors`) | ✅ |
+| Quick-access Export action dropdown in project view header | ✅ |
+| Project GitHub Webhook configuration card with payload URL and secret copy buttons | ✅ |
+| Laravel Pint code formatting check in CI pipeline (`.github/workflows/test.yml`) | ✅ |
+| Comprehensive Pest automated test coverage (signature validation, push/PR tasks, CSV/JSON exports) | ✅ |

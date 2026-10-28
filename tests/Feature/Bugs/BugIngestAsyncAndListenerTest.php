@@ -16,26 +16,26 @@ beforeEach(function () {
 
 it('successfully ingests error with environment, url, user_agent, and context', function () {
     $response = $this->withHeaders(['X-DevLoop-Key' => $this->apiKey])
-                     ->postJson('/api/v1/ingest', [
-                         'message' => 'ReferenceError: window is not defined at SSR',
-                         'stack' => "ReferenceError: window is not defined\n    at render (/app/ssr.js:25:3)",
-                         'severity' => 'critical',
-                         'environment' => 'staging',
-                         'url' => 'https://staging.myapp.com/dashboard',
-                         'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-                         'context' => [
-                             'feature' => 'ssr_rendering',
-                             'release' => 'v2.4.1',
-                             'user_id' => 88,
-                         ],
-                         'handled' => true,
-                     ]);
+        ->postJson('/api/v1/ingest', [
+            'message' => 'ReferenceError: window is not defined at SSR',
+            'stack' => "ReferenceError: window is not defined\n    at render (/app/ssr.js:25:3)",
+            'severity' => 'critical',
+            'environment' => 'staging',
+            'url' => 'https://staging.myapp.com/dashboard',
+            'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            'context' => [
+                'feature' => 'ssr_rendering',
+                'release' => 'v2.4.1',
+                'user_id' => 88,
+            ],
+            'handled' => true,
+        ]);
 
     $response->assertStatus(200)
-             ->assertJson([
-                 'environment' => 'staging',
-                 'severity' => 'critical',
-             ]);
+        ->assertJson([
+            'environment' => 'staging',
+            'severity' => 'critical',
+        ]);
 
     $bug = Bug::find($response->json('id'));
     expect($bug)->not->toBeNull();
@@ -52,19 +52,19 @@ it('successfully ingests error with environment, url, user_agent, and context', 
 
 it('recursively scrubs sensitive keys inside context payload', function () {
     $response = $this->withHeaders(['X-DevLoop-Key' => $this->apiKey])
-                     ->postJson('/api/v1/ingest', [
-                         'message' => 'PaymentFailedException: Card charge failed',
-                         'context' => [
-                             'password' => 'super_secret_pw',
-                             'token' => 'Bearer eyJhbGciOiJIUzI1Ni...',
-                             'credit_card' => '4111222233334444',
-                             'safe_meta' => 'order_1001',
-                             'nested' => [
-                                 'api_key' => 'sk_live_1234567890abcdef',
-                                 'notes' => 'connects with postgres://admin:hunter2@db:5432/main',
-                             ],
-                         ],
-                     ]);
+        ->postJson('/api/v1/ingest', [
+            'message' => 'PaymentFailedException: Card charge failed',
+            'context' => [
+                'password' => 'super_secret_pw',
+                'token' => 'Bearer eyJhbGciOiJIUzI1Ni...',
+                'credit_card' => '4111222233334444',
+                'safe_meta' => 'order_1001',
+                'nested' => [
+                    'api_key' => 'sk_live_1234567890abcdef',
+                    'notes' => 'connects with postgres://admin:hunter2@db:5432/main',
+                ],
+            ],
+        ]);
 
     $response->assertStatus(200);
     $bug = Bug::find($response->json('id'));
@@ -90,10 +90,10 @@ it('accepts asynchronous ingestion and returns 202 Accepted', function () {
     ]);
 
     $response->assertStatus(202)
-             ->assertJson([
-                 'status' => 'queued',
-                 'mode' => 'async',
-             ]);
+        ->assertJson([
+            'status' => 'queued',
+            'mode' => 'async',
+        ]);
 
     Queue::assertPushed(ProcessBugIngestJob::class, function ($job) {
         return $job->projectId === $this->project->id
@@ -103,25 +103,25 @@ it('accepts asynchronous ingestion and returns 202 Accepted', function () {
 
 it('processes batch error ingestion synchronously', function () {
     $response = $this->withHeaders(['X-DevLoop-Key' => $this->apiKey])
-                     ->postJson('/api/v1/ingest', [
-                         'events' => [
-                             [
-                                 'message' => 'TypeError: foo is not a function',
-                                 'severity' => 'low',
-                             ],
-                             [
-                                 'message' => 'SyntaxError: Unexpected token < in JSON',
-                                 'severity' => 'medium',
-                             ],
-                         ],
-                     ]);
+        ->postJson('/api/v1/ingest', [
+            'events' => [
+                [
+                    'message' => 'TypeError: foo is not a function',
+                    'severity' => 'low',
+                ],
+                [
+                    'message' => 'SyntaxError: Unexpected token < in JSON',
+                    'severity' => 'medium',
+                ],
+            ],
+        ]);
 
     $response->assertStatus(200)
-             ->assertJson([
-                 'status' => 'processed',
-                 'mode' => 'sync',
-                 'count' => 2,
-             ]);
+        ->assertJson([
+            'status' => 'processed',
+            'mode' => 'sync',
+            'count' => 2,
+        ]);
 
     expect(Bug::where('project_id', $this->project->id)->count())->toBe(2);
 });
@@ -130,20 +130,20 @@ it('queues batch error ingestion when async mode is requested', function () {
     Queue::fake();
 
     $response = $this->withHeaders(['X-DevLoop-Key' => $this->apiKey])
-                     ->postJson('/api/v1/ingest?async=true', [
-                         'events' => [
-                             ['message' => 'Error 1'],
-                             ['message' => 'Error 2'],
-                             ['message' => 'Error 3'],
-                         ],
-                     ]);
+        ->postJson('/api/v1/ingest?async=true', [
+            'events' => [
+                ['message' => 'Error 1'],
+                ['message' => 'Error 2'],
+                ['message' => 'Error 3'],
+            ],
+        ]);
 
     $response->assertStatus(202)
-             ->assertJson([
-                 'status' => 'queued',
-                 'mode' => 'async',
-                 'queued_count' => 3,
-             ]);
+        ->assertJson([
+            'status' => 'queued',
+            'mode' => 'async',
+            'queued_count' => 3,
+        ]);
 
     Queue::assertPushed(ProcessBugIngestJob::class);
 });
@@ -168,8 +168,8 @@ it('successfully runs ProcessBugIngestJob and writes to database', function () {
     app()->call([$job, 'handle']);
 
     $bug = Bug::where('project_id', $this->project->id)
-              ->where('error_type', 'WorkerCrashException')
-              ->first();
+        ->where('error_type', 'WorkerCrashException')
+        ->first();
 
     expect($bug)->not->toBeNull();
     expect($bug->environment)->toBe('worker-node-1');

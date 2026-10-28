@@ -1,8 +1,6 @@
 <?php
 
-use App\Models\Note;
 use App\Models\Project;
-use App\Models\Snippet;
 use App\Models\User;
 
 test('user can view and update their own snippet', function () {

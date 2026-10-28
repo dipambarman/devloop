@@ -57,11 +57,11 @@ class TaskAssignedNotification extends Notification implements ShouldQueue
 
         if ($this->task->priority) {
             $priorityValue = is_object($this->task->priority) ? $this->task->priority->value : $this->task->priority;
-            $mail->line("**Priority:** " . ucfirst($priorityValue));
+            $mail->line('**Priority:** '.ucfirst($priorityValue));
         }
 
         if ($this->task->due_date) {
-            $mail->line("**Due Date:** " . $this->task->due_date->format('M d, Y'));
+            $mail->line('**Due Date:** '.$this->task->due_date->format('M d, Y'));
         }
 
         return $mail

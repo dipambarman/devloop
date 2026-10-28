@@ -40,8 +40,8 @@ class BugController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('fingerprint', 'like', "%{$search}%")
-                  ->orWhere('raw_message', 'like', "%{$search}%");
+                    ->orWhere('fingerprint', 'like', "%{$search}%")
+                    ->orWhere('raw_message', 'like', "%{$search}%");
             });
         }
 
@@ -95,7 +95,7 @@ class BugController extends Controller
         );
 
         return redirect()->route('projects.bugs.show', [$project, $bug])
-                         ->with('success', 'Error ingested and fingerprinted successfully!');
+            ->with('success', 'Error ingested and fingerprinted successfully!');
     }
 
     /**
@@ -139,14 +139,14 @@ class BugController extends Controller
 
         $task = Task::create([
             'project_id' => $project->id,
-            'title' => "Fix [{$bug->error_type}]: " . mb_substr($bug->title, 0, 80),
+            'title' => "Fix [{$bug->error_type}]: ".mb_substr($bug->title, 0, 80),
             'description' => "### Root Cause Investigation\n\n"
-                . "**Fingerprint:** `{$bug->fingerprint}`\n"
-                . "**Occurrences:** {$bug->occurrence_count}\n"
-                . "**Regressions:** {$bug->regressions}\n"
-                . "**Last Seen:** " . ($bug->last_seen_at?->toDayDateTimeString() ?? 'Unknown') . "\n\n"
-                . "#### Error Message:\n```\n{$bug->raw_message}\n```\n\n"
-                . "#### Stack Trace:\n```\n{$bug->raw_stack}\n```",
+                ."**Fingerprint:** `{$bug->fingerprint}`\n"
+                ."**Occurrences:** {$bug->occurrence_count}\n"
+                ."**Regressions:** {$bug->regressions}\n"
+                .'**Last Seen:** '.($bug->last_seen_at?->toDayDateTimeString() ?? 'Unknown')."\n\n"
+                ."#### Error Message:\n```\n{$bug->raw_message}\n```\n\n"
+                ."#### Stack Trace:\n```\n{$bug->raw_stack}\n```",
             'priority' => $priority,
             'status' => 'todo',
             'creator_id' => auth()->id(),
@@ -159,7 +159,7 @@ class BugController extends Controller
         }
 
         return redirect()->route('tasks.show', $task)
-                         ->with('success', "Task #{$task->id} created from Bug #{$bug->id}!");
+            ->with('success', "Task #{$task->id} created from Bug #{$bug->id}!");
     }
 
     /**
@@ -173,6 +173,6 @@ class BugController extends Controller
         $bug->delete();
 
         return redirect()->route('projects.bugs.index', $project)
-                         ->with('success', 'Bug deleted successfully.');
+            ->with('success', 'Bug deleted successfully.');
     }
 }

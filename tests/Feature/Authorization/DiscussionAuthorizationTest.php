@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Discussion;
-use App\Models\DiscussionReply;
 use App\Models\Project;
 use App\Models\User;
 

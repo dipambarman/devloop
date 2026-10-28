@@ -12,4 +12,3 @@ it('returns a successful response for the changelog page', function () {
     $response->assertStatus(200);
     $response->assertSee('v1.4.0');
 });
-

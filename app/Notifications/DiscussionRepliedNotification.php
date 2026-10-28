@@ -56,7 +56,7 @@ class DiscussionRepliedNotification extends Notification implements ShouldQueue
             ->subject("[DevLoop] Reply to: {$this->discussion->title}")
             ->greeting("Hello {$notifiable->name},")
             ->line("{$this->replier->name} replied to your discussion in **{$project->name}**:")
-            ->line('"' . Str::limit($this->reply->content, 250) . '"')
+            ->line('"'.Str::limit($this->reply->content, 250).'"')
             ->action('View Discussion', $url)
             ->line('Join the conversation on DevLoop!');
     }

@@ -40,7 +40,7 @@ class SendSlackWebhookJob implements ShouldQueue
     {
         $webhook = SlackWebhook::find($this->webhookId);
 
-        if (!$webhook || !$webhook->is_active) {
+        if (! $webhook || ! $webhook->is_active) {
             return;
         }
 
@@ -55,7 +55,7 @@ class SendSlackWebhookJob implements ShouldQueue
                 'last_error_message' => $response->successful() ? null : mb_substr($response->body(), 0, 500),
             ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::warning("Slack webhook [{$webhook->id}] delivery failed with status {$response->status()}", [
                     'body' => $response->body(),
                 ]);

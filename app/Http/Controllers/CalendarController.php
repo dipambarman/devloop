@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ProjectStatus;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CalendarController extends Controller
 {
@@ -18,7 +18,7 @@ class CalendarController extends Controller
     public function index(Request $request, ?Project $project = null)
     {
         if ($project) {
-            \Illuminate\Support\Facades\Gate::authorize('view', $project);
+            Gate::authorize('view', $project);
         }
 
         // Determine current viewing month and year
@@ -51,7 +51,7 @@ class CalendarController extends Controller
             ])
             ->with(['project', 'assignee']);
 
-        if ($request->filled('project_id') && !$project) {
+        if ($request->filled('project_id') && ! $project) {
             $taskQuery->where('project_id', $request->project_id);
         }
 

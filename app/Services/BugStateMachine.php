@@ -35,7 +35,7 @@ class BugStateMachine
         }
 
         $allowed = self::TRANSITIONS[$currentStatus] ?? [];
-        if (!in_array($toStatus, $allowed, true)) {
+        if (! in_array($toStatus, $allowed, true)) {
             throw ValidationException::withMessages([
                 'status' => ["Illegal status transition from '{$currentStatus}' to '{$toStatus}'."],
             ]);

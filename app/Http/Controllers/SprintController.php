@@ -120,7 +120,7 @@ class SprintController extends Controller
         }
 
         $sprint->status = SprintStatus::Active;
-        if (!$sprint->start_date) {
+        if (! $sprint->start_date) {
             $sprint->start_date = now()->startOfDay();
         }
         $sprint->save();
@@ -153,21 +153,21 @@ class SprintController extends Controller
             if ($rolloverAction === 'next_sprint' && $targetSprintId) {
                 // Ensure target sprint belongs to the same project
                 $targetSprint = $project->sprints()->findOrFail($targetSprintId);
-                $incompleteTasks->each(fn(Task $task) => $task->update(['sprint_id' => $targetSprint->id]));
+                $incompleteTasks->each(fn (Task $task) => $task->update(['sprint_id' => $targetSprint->id]));
             } else {
                 // Return to backlog
-                $incompleteTasks->each(fn(Task $task) => $task->update(['sprint_id' => null]));
+                $incompleteTasks->each(fn (Task $task) => $task->update(['sprint_id' => null]));
             }
         }
 
         $sprint->status = SprintStatus::Completed;
-        if (!$sprint->end_date) {
+        if (! $sprint->end_date) {
             $sprint->end_date = now()->startOfDay();
         }
         $sprint->save();
 
         return redirect()->route('projects.sprints.index', $project)
-            ->with('success', "Sprint '{$sprint->name}' completed. Incomplete tasks moved to " . ($rolloverAction === 'next_sprint' ? 'next sprint' : 'backlog') . ".");
+            ->with('success', "Sprint '{$sprint->name}' completed. Incomplete tasks moved to ".($rolloverAction === 'next_sprint' ? 'next sprint' : 'backlog').'.');
     }
 
     /**
@@ -183,7 +183,7 @@ class SprintController extends Controller
             'sprint_id' => ['nullable', 'exists:sprints,id'],
         ]);
 
-        if (!empty($validated['sprint_id'])) {
+        if (! empty($validated['sprint_id'])) {
             $targetSprint = $project->sprints()->findOrFail($validated['sprint_id']);
             $task->sprint_id = $targetSprint->id;
         } else {

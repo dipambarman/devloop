@@ -25,7 +25,7 @@ class BugIngestController extends Controller
             ?: $request->header('x-api-key')
             ?: $request->query('key');
 
-        if (!$apiKey) {
+        if (! $apiKey) {
             return response()->json([
                 'error' => 'Missing Ingest API Key in X-DevLoop-Key header.',
                 'code' => 'UNAUTHORIZED',
@@ -35,7 +35,7 @@ class BugIngestController extends Controller
         $keyHash = hash('sha256', $apiKey);
         $project = Project::where('ingest_key_hash', $keyHash)->first();
 
-        if (!$project) {
+        if (! $project) {
             return response()->json([
                 'error' => 'Invalid or revoked Ingest API Key.',
                 'code' => 'INVALID_API_KEY',

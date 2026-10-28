@@ -19,7 +19,7 @@ class ProjectKeyController extends Controller
         $plainKey = $project->generateIngestKey();
 
         return back()->with('success', 'New Ingest API key generated!')
-                     ->with('plaintext_key', $plainKey);
+            ->with('plaintext_key', $plainKey);
     }
 
     /**

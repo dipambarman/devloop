@@ -5,6 +5,7 @@ namespace App\Events;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 class TaskCreated extends ProjectActivityEvent
 {
@@ -21,7 +22,7 @@ class TaskCreated extends ProjectActivityEvent
         return 'task_created';
     }
 
-    public function subject(): \Illuminate\Database\Eloquent\Model
+    public function subject(): Model
     {
         return $this->task;
     }

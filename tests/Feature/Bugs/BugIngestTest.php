@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\Bug;
-use App\Models\BugEvent;
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Support\Facades\RateLimiter;
 
 beforeEach(function () {
     $this->owner = User::factory()->create();
@@ -18,36 +18,36 @@ it('rejects ingest request without API key', function () {
     ]);
 
     $response->assertStatus(401)
-             ->assertJson(['code' => 'UNAUTHORIZED']);
+        ->assertJson(['code' => 'UNAUTHORIZED']);
 });
 
 it('rejects ingest request with invalid API key', function () {
     $response = $this->withHeaders(['X-DevLoop-Key' => 'dl_ingest_invalid_key_12345'])
-                     ->postJson('/api/v1/ingest', [
-                         'message' => 'Uncaught TypeError: Cannot read property of undefined',
-                     ]);
+        ->postJson('/api/v1/ingest', [
+            'message' => 'Uncaught TypeError: Cannot read property of undefined',
+        ]);
 
     $response->assertStatus(401)
-             ->assertJson(['code' => 'INVALID_API_KEY']);
+        ->assertJson(['code' => 'INVALID_API_KEY']);
 });
 
 it('successfully ingests a new error and computes fingerprint', function () {
     $response = $this->withHeaders(['X-DevLoop-Key' => $this->apiKey])
-                     ->postJson('/api/v1/ingest', [
-                         'message' => 'TypeError: Cannot read properties of undefined (reading "map") at user 12345',
-                         'stack' => "TypeError: Cannot read properties\n    at renderList (/app/views/userList.js:42:15)\n    at Component.render",
-                         'severity' => 'high',
-                     ]);
+        ->postJson('/api/v1/ingest', [
+            'message' => 'TypeError: Cannot read properties of undefined (reading "map") at user 12345',
+            'stack' => "TypeError: Cannot read properties\n    at renderList (/app/views/userList.js:42:15)\n    at Component.render",
+            'severity' => 'high',
+        ]);
 
     $response->assertStatus(200)
-             ->assertJsonStructure(['id', 'fingerprint', 'title', 'occurrence_count', 'status', 'regressions'])
-             ->assertJson([
-                 'occurrence_count' => 1,
-                 'regressions' => 0,
-                 'status' => 'open',
-                 'severity' => 'high',
-                 'error_type' => 'TypeError',
-             ]);
+        ->assertJsonStructure(['id', 'fingerprint', 'title', 'occurrence_count', 'status', 'regressions'])
+        ->assertJson([
+            'occurrence_count' => 1,
+            'regressions' => 0,
+            'status' => 'open',
+            'severity' => 'high',
+            'error_type' => 'TypeError',
+        ]);
 
     $bug = Bug::find($response->json('id'));
     expect($bug)->not->toBeNull();
@@ -98,12 +98,12 @@ it('autonomously detects regressions and reopens fixed bugs', function () {
     // 3. Same error occurs again (e.g. from a recurring AI coding hallucination)
     $res2 = $this->withHeaders(['X-DevLoop-Key' => $this->apiKey])->postJson('/api/v1/ingest', $payload);
     $res2->assertStatus(200)
-         ->assertJson([
-             'id' => $bug->id,
-             'status' => 'open',
-             'regressions' => 1,
-             'occurrence_count' => 2,
-         ]);
+        ->assertJson([
+            'id' => $bug->id,
+            'status' => 'open',
+            'regressions' => 1,
+            'occurrence_count' => 2,
+        ]);
 
     $bug->refresh();
     expect($bug->status)->toBe('open');
@@ -138,15 +138,15 @@ it('redacts database credentials, Bearer tokens, and API keys from error message
 });
 
 it('enforces rate limiting on headless ingest route', function () {
-    $limiterKey = md5('ingest' . $this->apiKey);
+    $limiterKey = md5('ingest'.$this->apiKey);
     for ($i = 0; $i < 300; $i++) {
-        \Illuminate\Support\Facades\RateLimiter::hit($limiterKey);
+        RateLimiter::hit($limiterKey);
     }
 
     $response = $this->withHeaders(['X-DevLoop-Key' => $this->apiKey])
-                     ->postJson('/api/v1/ingest', [
-                         'message' => 'Rate limit probe error',
-                     ]);
+        ->postJson('/api/v1/ingest', [
+            'message' => 'Rate limit probe error',
+        ]);
 
     $response->assertStatus(429);
 });

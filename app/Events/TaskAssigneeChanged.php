@@ -5,6 +5,7 @@ namespace App\Events;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 class TaskAssigneeChanged extends ProjectActivityEvent
 {
@@ -28,7 +29,7 @@ class TaskAssigneeChanged extends ProjectActivityEvent
         return 'assignee_changed';
     }
 
-    public function subject(): \Illuminate\Database\Eloquent\Model
+    public function subject(): Model
     {
         return $this->task;
     }

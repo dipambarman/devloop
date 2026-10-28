@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -63,7 +63,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $prefs = $this->getNotificationPreferences();
 
-        return !empty($prefs[$type][$channel]);
+        return ! empty($prefs[$type][$channel]);
     }
 
     public function projects()
@@ -77,8 +77,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function memberProjects()
     {
         return $this->belongsToMany(Project::class, 'project_user')
-                    ->withPivot('role')
-                    ->withTimestamps();
+            ->withPivot('role')
+            ->withTimestamps();
     }
 
     /**

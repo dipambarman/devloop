@@ -2,8 +2,19 @@
 
 namespace App\Providers;
 
+use App\Events\CommentAdded;
+use App\Events\DiscussionReplyAdded;
+use App\Events\MemberAdded;
+use App\Events\ProjectActivityEvent;
+use App\Events\TaskAssigneeChanged;
+use App\Listeners\LogActivityListener;
+use App\Listeners\SendCommentNotification;
+use App\Listeners\SendDiscussionReplyNotification;
+use App\Listeners\SendMemberAddedNotification;
+use App\Listeners\SendTaskAssignedNotification;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -33,29 +44,29 @@ class AppServiceProvider extends ServiceProvider
                 : $rule->mixedCase()->letters()->numbers()->symbols()->uncompromised();
         });
 
-        \Illuminate\Support\Facades\Event::listen(
-            \App\Events\ProjectActivityEvent::class,
-            \App\Listeners\LogActivityListener::class,
+        Event::listen(
+            ProjectActivityEvent::class,
+            LogActivityListener::class,
         );
 
-        \Illuminate\Support\Facades\Event::listen(
-            \App\Events\TaskAssigneeChanged::class,
-            \App\Listeners\SendTaskAssignedNotification::class,
+        Event::listen(
+            TaskAssigneeChanged::class,
+            SendTaskAssignedNotification::class,
         );
 
-        \Illuminate\Support\Facades\Event::listen(
-            \App\Events\CommentAdded::class,
-            \App\Listeners\SendCommentNotification::class,
+        Event::listen(
+            CommentAdded::class,
+            SendCommentNotification::class,
         );
 
-        \Illuminate\Support\Facades\Event::listen(
-            \App\Events\DiscussionReplyAdded::class,
-            \App\Listeners\SendDiscussionReplyNotification::class,
+        Event::listen(
+            DiscussionReplyAdded::class,
+            SendDiscussionReplyNotification::class,
         );
 
-        \Illuminate\Support\Facades\Event::listen(
-            \App\Events\MemberAdded::class,
-            \App\Listeners\SendMemberAddedNotification::class,
+        Event::listen(
+            MemberAdded::class,
+            SendMemberAddedNotification::class,
         );
 
         // ── Tiered Rate Limiters ─────────────────────────────────
@@ -87,6 +98,7 @@ class AppServiceProvider extends ServiceProvider
         // Ingest: headless API for error reporting (300 req/min per key/IP).
         RateLimiter::for('ingest', function (Request $request) {
             $key = $request->header('X-DevLoop-Key') ?: $request->header('x-api-key') ?: $request->ip();
+
             return Limit::perMinute(300)->by($key);
         });
     }

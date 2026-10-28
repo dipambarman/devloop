@@ -8,10 +8,15 @@ class ErrorFingerprintService
      * Regexes applied in order to normalize error message.
      */
     protected const UUID_RE = '/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i';
+
     protected const HEX_0X_RE = '/\b0x[0-9a-f]+\b/i';
+
     protected const HEX_LONG_RE = '/\b(?=[0-9a-f]*[0-9])[0-9a-f]{8,}\b/i';
+
     protected const LINE_COL_RE = '/\b\d+:\d+\b/';
+
     protected const INTEGER_RE = '/\b\d+\b/';
+
     protected const WS_RE = '/\s+/';
 
     /**
@@ -57,6 +62,7 @@ class ErrorFingerprintService
     public function fileBasename(string $filePath): string
     {
         $parts = preg_split('#[/\\\\]#', $filePath);
+
         return end($parts) ?: $filePath;
     }
 
@@ -70,6 +76,7 @@ class ErrorFingerprintService
         }
 
         $cleaned = preg_replace('/^Object\./', '', $name);
+
         return trim($cleaned);
     }
 
@@ -96,12 +103,14 @@ class ErrorFingerprintService
             if (preg_match('/^at\s+(.+?)\s+\((.+?)(?::\d+(?::\d+)?)?\)$/', $t, $m)) {
                 $fn = $this->cleanFunc($m[1]);
                 $file = $this->fileBasename($m[2]);
+
                 return ($fn === 'anonymous' && $file === 'anonymous') ? 'anonymous' : "{$fn}@{$file}";
             }
 
             // Node/V8 anonymous: "at /path/to/file.js:42:13"
             if (preg_match('/^at\s+([^(]+?)(?::\d+(?::\d+)?)?$/', $t, $m)) {
                 $file = $this->fileBasename(trim($m[1]));
+
                 return ($file === 'anonymous' || $file === '<anonymous>') ? 'anonymous' : "anonymous@{$file}";
             }
 
@@ -109,6 +118,7 @@ class ErrorFingerprintService
             if (preg_match('/^(.+?)@(.+?)(?::\d+(?::\d+)?)?$/', $t, $m)) {
                 $fn = $this->cleanFunc($m[1]);
                 $file = $this->fileBasename($m[2]);
+
                 return ($fn === 'anonymous' && $file === 'anonymous') ? 'anonymous' : "{$fn}@{$file}";
             }
 
@@ -116,6 +126,7 @@ class ErrorFingerprintService
             if (preg_match('/^#\d+\s+(.+?)(?:\(\d+\))?:\s+(.+)$/', $t, $m)) {
                 $file = $this->fileBasename(trim($m[1]));
                 $fn = $this->cleanFunc(trim($m[2]));
+
                 return "{$fn}@{$file}";
             }
         }

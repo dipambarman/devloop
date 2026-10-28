@@ -4,13 +4,14 @@ namespace App\Models;
 
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
+use Database\Factories\TaskFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Task extends Model
 {
-    /** @use HasFactory<\Database\Factories\TaskFactory> */
+    /** @use HasFactory<TaskFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
@@ -76,7 +77,7 @@ class Task extends Model
     public function dependencies()
     {
         return $this->belongsToMany(Task::class, 'task_dependencies', 'task_id', 'depends_on_task_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -85,7 +86,7 @@ class Task extends Model
     public function dependents()
     {
         return $this->belongsToMany(Task::class, 'task_dependencies', 'depends_on_task_id', 'task_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -136,6 +137,7 @@ class Task extends Model
         if ($hours > 0) {
             return "{$hours}h";
         }
+
         return "{$mins}m";
     }
 }

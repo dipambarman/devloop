@@ -67,7 +67,7 @@ class DashboardService
      */
     public function getRecentTasks(?Collection $projectIds = null, int $limit = 5)
     {
-        if (!$projectIds && auth()->check()) {
+        if (! $projectIds && auth()->check()) {
             $projectIds = auth()->user()->allProjects()->pluck('id');
         }
 
@@ -83,7 +83,7 @@ class DashboardService
      */
     public function getTaskDistribution(?Collection $projectIds = null): array
     {
-        if (!$projectIds && auth()->check()) {
+        if (! $projectIds && auth()->check()) {
             $projectIds = auth()->user()->allProjects()->pluck('id');
         }
 

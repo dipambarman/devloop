@@ -34,7 +34,7 @@ test('queue:monitor-health alerts and exits with failure when threshold is excee
                 'connection' => 'database',
                 'queue' => 'default',
                 'payload' => '{}',
-                'exception' => 'RuntimeError: Threshold exceeded failure ' . $i,
+                'exception' => 'RuntimeError: Threshold exceeded failure '.$i,
                 'failed_at' => now(),
             ]);
         }

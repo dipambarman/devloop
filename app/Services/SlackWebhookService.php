@@ -17,13 +17,13 @@ class SlackWebhookService
     public function sendTestNotification(SlackWebhook $webhook): array
     {
         $payload = [
-            'text' => "✅ DevLoop Slack Webhook Test — Connection Verified!",
+            'text' => '✅ DevLoop Slack Webhook Test — Connection Verified!',
             'blocks' => [
                 [
                     'type' => 'header',
                     'text' => [
                         'type' => 'plain_text',
-                        'text' => "✅ DevLoop Webhook Verified",
+                        'text' => '✅ DevLoop Webhook Verified',
                         'emoji' => true,
                     ],
                 ],
@@ -39,7 +39,7 @@ class SlackWebhookService
                     'elements' => [
                         [
                             'type' => 'mrkdwn',
-                            'text' => "DevLoop Mini Ingest &middot; Project ID: #{$webhook->project->id} &middot; " . now()->toFormattedDateString() . ' ' . now()->toTimeString(),
+                            'text' => "DevLoop Mini Ingest &middot; Project ID: #{$webhook->project->id} &middot; ".now()->toFormattedDateString().' '.now()->toTimeString(),
                         ],
                     ],
                 ],
@@ -62,7 +62,7 @@ class SlackWebhookService
             return [
                 'success' => $success,
                 'status' => $response->status(),
-                'message' => $success ? 'Test webhook delivered successfully to Slack!' : 'Slack returned HTTP error: ' . $response->status(),
+                'message' => $success ? 'Test webhook delivered successfully to Slack!' : 'Slack returned HTTP error: '.$response->status(),
             ];
         } catch (\Throwable $e) {
             $webhook->update([
@@ -76,7 +76,7 @@ class SlackWebhookService
             return [
                 'success' => false,
                 'status' => 0,
-                'message' => 'Connection failed: ' . $e->getMessage(),
+                'message' => 'Connection failed: '.$e->getMessage(),
             ];
         }
     }
@@ -118,7 +118,7 @@ class SlackWebhookService
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',
-                    'text' => "*<{$bugUrl}|" . htmlspecialchars($bug->title, ENT_QUOTES) . ">*",
+                    'text' => "*<{$bugUrl}|".htmlspecialchars($bug->title, ENT_QUOTES).'>*',
                 ],
             ],
             [
@@ -126,41 +126,41 @@ class SlackWebhookService
                 'fields' => [
                     [
                         'type' => 'mrkdwn',
-                        'text' => "*Severity:*\n" . strtoupper($bug->severity),
+                        'text' => "*Severity:*\n".strtoupper($bug->severity),
                     ],
                     [
                         'type' => 'mrkdwn',
-                        'text' => "*Environment:*\n`" . ($bug->environment ?: 'production') . "`",
+                        'text' => "*Environment:*\n`".($bug->environment ?: 'production').'`',
                     ],
                     [
                         'type' => 'mrkdwn',
-                        'text' => "*Status:*\n" . ucfirst($bug->status),
+                        'text' => "*Status:*\n".ucfirst($bug->status),
                     ],
                     [
                         'type' => 'mrkdwn',
-                        'text' => "*Occurrences:*\n" . number_format($bug->occurrence_count) . ($bug->regressions > 0 ? " ({$bug->regressions} regressions)" : ''),
+                        'text' => "*Occurrences:*\n".number_format($bug->occurrence_count).($bug->regressions > 0 ? " ({$bug->regressions} regressions)" : ''),
                     ],
                 ],
             ],
         ];
 
-        if (!empty($cleanMsg)) {
+        if (! empty($cleanMsg)) {
             $blocks[] = [
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',
-                    'text' => "*Error Message:*\n```" . htmlspecialchars($cleanMsg, ENT_QUOTES) . "```",
+                    'text' => "*Error Message:*\n```".htmlspecialchars($cleanMsg, ENT_QUOTES).'```',
                 ],
             ];
         }
 
-        if (!empty($bug->raw_stack)) {
+        if (! empty($bug->raw_stack)) {
             $stackExcerpt = mb_substr($bug->raw_stack, 0, 400);
             $blocks[] = [
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',
-                    'text' => "*Stack Trace Excerpt:*\n```" . htmlspecialchars($stackExcerpt, ENT_QUOTES) . "```",
+                    'text' => "*Stack Trace Excerpt:*\n```".htmlspecialchars($stackExcerpt, ENT_QUOTES).'```',
                 ],
             ];
         }
@@ -186,7 +186,7 @@ class SlackWebhookService
             'elements' => [
                 [
                     'type' => 'mrkdwn',
-                    'text' => "DevLoop Mini Engine &middot; Error Fingerprint: `{$bug->fingerprint}` &middot; " . now()->toFormattedDateString() . ' ' . now()->toTimeString(),
+                    'text' => "DevLoop Mini Engine &middot; Error Fingerprint: `{$bug->fingerprint}` &middot; ".now()->toFormattedDateString().' '.now()->toTimeString(),
                 ],
             ],
         ];
@@ -203,7 +203,7 @@ class SlackWebhookService
     public function dispatchForBug(Bug $bug, string $eventType): void
     {
         $project = $bug->project ?? Project::find($bug->project_id);
-        if (!$project) {
+        if (! $project) {
             return;
         }
 

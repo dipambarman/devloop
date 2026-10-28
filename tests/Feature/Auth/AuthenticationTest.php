@@ -98,7 +98,7 @@ test('existing user logs in via github oauth callback and refreshes identity', f
 
 test('handles failed github oauth callback gracefully', function () {
     $provider = Mockery::mock(GithubProvider::class);
-    $provider->shouldReceive('user')->andThrow(new \Exception('The user cancelled authorization'));
+    $provider->shouldReceive('user')->andThrow(new Exception('The user cancelled authorization'));
 
     Socialite::shouldReceive('driver')->with('github')->andReturn($provider);
 

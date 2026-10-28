@@ -40,7 +40,7 @@ class ActivityLog extends Model
      */
     public function getIconAttribute(): string
     {
-        return match($this->event) {
+        return match ($this->event) {
             'task_created' => 'plus-circle',
             'task_updated' => 'pencil',
             'status_changed' => 'refresh',
@@ -60,7 +60,7 @@ class ActivityLog extends Model
      */
     public function getColorAttribute(): string
     {
-        return match($this->event) {
+        return match ($this->event) {
             'task_created' => 'text-teal',
             'status_changed' => 'text-primary',
             'priority_changed' => 'text-warning',

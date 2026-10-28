@@ -116,8 +116,17 @@ Normalized relational schema, asynchronous queue pipelines, fingerprinting state
   - Graph-based dependency management ($O(V + E)$ BFS algorithm) preventing circular deadlocks (`A -> B -> C -> A`).
 - [x] **Activity Event Stream**: Polymorphic `ActivityLog` tracking changes to tasks, comments, and members.
 
-### Remaining & Next Steps ⏳
-- [ ] **Bidirectional GitHub Webhook Ingest**: Listening for GitHub `push` and `pull_request` webhooks to automatically close tasks matching commit syntax (`Fixes #123`).
+- [x] **Bidirectional GitHub Webhook Ingest**:
+  - Webhook receiver (`POST /api/webhooks/github` and `/api/projects/{project}/webhooks/github`) processing `push` and `pull_request` (closed/merged) events.
+  - Automatic task closure via commit message keywords (`Fixes #12`, `Closes #12`, `Resolves #12`).
+  - Automatic task comment recording with commit hash, link, and author.
+  - Polymorphic activity logging for repository sync events.
+  - Cryptographic HMAC-SHA256 signature verification (`X-Hub-Signature-256`) against project-scoped webhook secrets.
+- [x] **Project Data Export (CSV & JSON)**:
+  - Streamed CSV export for tasks with UTF-8 BOM encoding for Excel compatibility (`/projects/{project}/export/tasks`).
+  - Formatted JSON export for tasks with assignee and tag metadata (`/projects/{project}/export/tasks?format=json`).
+  - Streamed CSV and JSON exports for captured error logs and bug events (`/projects/{project}/export/errors`).
+  - Integrated quick-action dropdown menu in project show view.
 - [ ] **WebSocket Broadcasts (Laravel Reverb)**: Push task status and board movements live to connected browser clients without polling.
 - [ ] **Digest Email Aggregator**: Scheduled command to aggregate daily unread notifications into a single morning summary email.
 
@@ -128,11 +137,12 @@ Normalized relational schema, asynchronous queue pipelines, fingerprinting state
 Automated testing and deployment pipelines via GitHub Actions.
 
 ### Completed Features ✅
-- [x] **Automated Pest Test Suite**: 187 comprehensive feature and unit tests with 577 assertions passing in under 20 seconds.
+- [x] **Automated Pest Test Suite**: Comprehensive feature and unit tests passing in isolated SQLite in-memory test database.
 - [x] **GitHub Actions CI Pipeline (`.github/workflows/test.yml`)**:
   - Triggers on every push and pull request to `main`.
   - Sets up PHP 8.3, Composer dependencies with caching.
   - Sets up Node 20, runs `npm ci` and `npm run build`.
+  - Runs Laravel Pint style and syntax validation (`vendor/bin/pint --test`).
   - Executes full test suite in an isolated test environment.
 - [x] **GitHub Actions CD Deploy Pipeline (`.github/workflows/deploy.yml`)**:
   - Production deployment workflow targeting remote VPS via SSH (`appleboy/ssh-action`).
@@ -141,7 +151,6 @@ Automated testing and deployment pipelines via GitHub Actions.
 
 ### Remaining & Next Steps ⏳
 - [ ] **GitHub Repository Secrets Configuration**: Add `SERVER_HOST`, `SERVER_USER`, and `SSH_PRIVATE_KEY` to GitHub repo settings once the Oracle Cloud VM is active.
-- [ ] **PHP CodeSniffer / Pint Style Linter in CI**: Run `vendor/bin/pint --test` in `test.yml` to enforce PSR-12 code standards automatically.
 - [ ] **Docker Image Build & Push Workflow**: Build pre-compiled Docker container image and publish to GitHub Container Registry (`ghcr.io/dipambarman/devloop`).
 
 ---

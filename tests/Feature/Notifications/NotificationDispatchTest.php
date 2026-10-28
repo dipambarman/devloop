@@ -1,8 +1,6 @@
 <?php
 
 use App\Enums\ProjectRole;
-use App\Models\Comment;
-use App\Models\Discussion;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;

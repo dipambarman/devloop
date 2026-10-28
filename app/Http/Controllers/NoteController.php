@@ -34,7 +34,7 @@ class NoteController extends Controller
     {
         $projects = auth()->user()->allProjects()->get();
         $selectedProject = $request->project_id;
-        
+
         return view('notes.create', compact('projects', 'selectedProject'));
     }
 
@@ -104,7 +104,7 @@ class NoteController extends Controller
     {
         Gate::authorize('update', $note);
 
-        $note->update(['is_pinned' => !$note->is_pinned]);
+        $note->update(['is_pinned' => ! $note->is_pinned]);
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['success' => true, 'is_pinned' => $note->is_pinned]);

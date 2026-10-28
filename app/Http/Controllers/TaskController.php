@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MilestoneStatus;
 use App\Enums\ProjectStatus;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
-use App\Models\Task;
-use App\Models\Tag;
-use App\Models\User;
+use App\Events\TaskAssigneeChanged;
+use App\Events\TaskCreated;
+use App\Events\TaskPriorityChanged;
+use App\Events\TaskStatusChanged;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Models\Project;
+use App\Models\Tag;
+use App\Models\Task;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
@@ -18,20 +24,20 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(\Illuminate\Http\Request $request)
+    public function index(Request $request)
     {
         $query = Task::where(function ($q) {
             $q->whereHas('project', function ($pq) {
                 $pq->where('owner_id', auth()->id())
-                  ->orWhereHas('members', fn($mq) => $mq->where('users.id', auth()->id()));
+                    ->orWhereHas('members', fn ($mq) => $mq->where('users.id', auth()->id()));
             })->orWhere('assignee_id', auth()->id());
         })->with(['assignee', 'project', 'tags']);
 
         // Filters
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
+                $q->where('title', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -40,7 +46,7 @@ class TaskController extends Controller
         }
 
         $priorityFilter = $request->input('priority') ?? $request->input('severity');
-        if (!empty($priorityFilter)) {
+        if (! empty($priorityFilter)) {
             $query->where('priority', $priorityFilter);
         }
 
@@ -57,14 +63,14 @@ class TaskController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(\Illuminate\Http\Request $request)
+    public function create(Request $request)
     {
         $projects = auth()->user()->allProjects()->where('status', ProjectStatus::Active)->get();
         $selectedProject = $request->query('project_id');
         $users = collect();
 
         if ($selectedProject) {
-            $project = \App\Models\Project::find($selectedProject);
+            $project = Project::find($selectedProject);
             if ($project && $project->isAccessibleBy(auth()->user())) {
                 $users = $project->members()->get()->push($project->owner)->unique('id');
             }
@@ -95,7 +101,7 @@ class TaskController extends Controller
             $task->tags()->sync($request->tags);
         }
 
-        \App\Events\TaskCreated::dispatch($task->project, auth()->user(), $task);
+        TaskCreated::dispatch($task->project, auth()->user(), $task);
 
         return redirect()->route('projects.show', $task->project)
             ->with('success', 'Task created successfully!');
@@ -129,7 +135,7 @@ class TaskController extends Controller
             ->get(['id', 'title', 'status']);
 
         $projectMilestones = $task->project->milestones()
-            ->where('status', \App\Enums\MilestoneStatus::Open)
+            ->where('status', MilestoneStatus::Open)
             ->get();
 
         return view('tasks.show', compact('task', 'projectMembers', 'availablePrerequisites', 'projectMilestones'));
@@ -162,7 +168,7 @@ class TaskController extends Controller
         $oldAssignee = $task->assignee; // Load the model before it changes
 
         $task->update($request->only([
-            'title', 'description', 'status', 'priority', 'assignee_id', 'due_date'
+            'title', 'description', 'status', 'priority', 'assignee_id', 'due_date',
         ]));
 
         if ($request->has('tags')) {
@@ -170,15 +176,15 @@ class TaskController extends Controller
         }
 
         if ($oldStatus !== $task->status) {
-            \App\Events\TaskStatusChanged::dispatch($task->project, auth()->user(), $task, $oldStatus, $task->status);
+            TaskStatusChanged::dispatch($task->project, auth()->user(), $task, $oldStatus, $task->status);
         }
-        
+
         if ($oldPriority !== $task->priority) {
-            \App\Events\TaskPriorityChanged::dispatch($task->project, auth()->user(), $task, $oldPriority, $task->priority);
+            TaskPriorityChanged::dispatch($task->project, auth()->user(), $task, $oldPriority, $task->priority);
         }
 
         if ($oldAssigneeId !== $task->assignee_id) {
-            \App\Events\TaskAssigneeChanged::dispatch($task->project, auth()->user(), $task, $oldAssignee, $task->assignee);
+            TaskAssigneeChanged::dispatch($task->project, auth()->user(), $task, $oldAssignee, $task->assignee);
         }
 
         return redirect()->route('tasks.show', $task)
@@ -202,23 +208,23 @@ class TaskController extends Controller
     /**
      * Update the task status and order via AJAX (Kanban board).
      */
-    public function updateStatus(\Illuminate\Http\Request $request, Task $task)
+    public function updateStatus(Request $request, Task $task)
     {
         Gate::authorize('update', $task);
 
         $request->validate([
             'status' => ['required', Rule::enum(TaskStatus::class)],
-            'order' => 'array'
+            'order' => 'array',
         ]);
 
         $oldStatus = $task->status;
 
         $task->update([
-            'status' => $request->status
+            'status' => $request->status,
         ]);
 
         if ($oldStatus !== $task->status) {
-            \App\Events\TaskStatusChanged::dispatch($task->project, auth()->user(), $task, $oldStatus, $task->status);
+            TaskStatusChanged::dispatch($task->project, auth()->user(), $task, $oldStatus, $task->status);
         }
 
         if ($request->has('order')) {
@@ -236,7 +242,7 @@ class TaskController extends Controller
     /**
      * Update the task status inline.
      */
-    public function updateStatusInline(\Illuminate\Http\Request $request, Task $task)
+    public function updateStatusInline(Request $request, Task $task)
     {
         Gate::authorize('update', $task);
 
@@ -246,7 +252,7 @@ class TaskController extends Controller
         $task->update(['status' => $request->status]);
 
         if ($oldStatus !== $task->status) {
-            \App\Events\TaskStatusChanged::dispatch($task->project, auth()->user(), $task, $oldStatus, $task->status);
+            TaskStatusChanged::dispatch($task->project, auth()->user(), $task, $oldStatus, $task->status);
         }
 
         return redirect()->back()->with('success', 'Status updated.');
@@ -255,7 +261,7 @@ class TaskController extends Controller
     /**
      * Update the task priority inline.
      */
-    public function updatePriorityInline(\Illuminate\Http\Request $request, Task $task)
+    public function updatePriorityInline(Request $request, Task $task)
     {
         Gate::authorize('update', $task);
 
@@ -265,7 +271,7 @@ class TaskController extends Controller
         $task->update(['priority' => $request->priority]);
 
         if ($oldPriority !== $task->priority) {
-            \App\Events\TaskPriorityChanged::dispatch($task->project, auth()->user(), $task, $oldPriority, $task->priority);
+            TaskPriorityChanged::dispatch($task->project, auth()->user(), $task, $oldPriority, $task->priority);
         }
 
         return redirect()->back()->with('success', 'Priority updated.');
@@ -274,7 +280,7 @@ class TaskController extends Controller
     /**
      * Update the task assignee inline.
      */
-    public function updateAssigneeInline(\Illuminate\Http\Request $request, Task $task)
+    public function updateAssigneeInline(Request $request, Task $task)
     {
         Gate::authorize('update', $task);
 
@@ -286,7 +292,7 @@ class TaskController extends Controller
         $task->update(['assignee_id' => $request->assignee_id]);
 
         if ($oldAssigneeId != $task->assignee_id) { // intentional loose comparison to handle null vs empty string
-            \App\Events\TaskAssigneeChanged::dispatch($task->project, auth()->user(), $task, $oldAssignee, $task->fresh()->assignee);
+            TaskAssigneeChanged::dispatch($task->project, auth()->user(), $task, $oldAssignee, $task->fresh()->assignee);
         }
 
         return redirect()->back()->with('success', 'Assignee updated.');

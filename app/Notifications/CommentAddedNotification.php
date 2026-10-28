@@ -54,7 +54,7 @@ class CommentAddedNotification extends Notification implements ShouldQueue
             ->subject("[DevLoop] Comment on: {$task->title}")
             ->greeting("Hello {$notifiable->name},")
             ->line("{$this->commenter->name} posted a comment on **{$task->title}**:")
-            ->line('"' . Str::limit($this->comment->content, 250) . '"')
+            ->line('"'.Str::limit($this->comment->content, 250).'"')
             ->action('View Comment', $url)
             ->line('Keep up the great collaboration on DevLoop!');
     }

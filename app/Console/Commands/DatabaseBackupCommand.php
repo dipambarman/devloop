@@ -37,7 +37,7 @@ class DatabaseBackupCommand extends Command
     {
         $backupDir = storage_path('app/backups');
 
-        if (!File::exists($backupDir)) {
+        if (! File::exists($backupDir)) {
             File::makeDirectory($backupDir, 0755, true);
         }
 
@@ -47,23 +47,24 @@ class DatabaseBackupCommand extends Command
 
         if ($this->option('clean')) {
             $this->cleanExpiredBackups($backupDir, (int) $this->option('keep'));
+
             return Command::SUCCESS;
         }
 
         $connection = config('database.default');
         $this->info("Starting database backup for connection [{$connection}]...");
 
-        $compress = !$this->option('no-compression');
+        $compress = ! $this->option('no-compression');
         $extension = $compress ? '.sql.gz' : '.sql';
         $timestamp = now()->format('Y-m-d-His');
         $defaultName = "devloop-backup-{$timestamp}{$extension}";
 
         $filename = $this->option('filename') ? $this->option('filename') : $defaultName;
-        if (!str_ends_with($filename, $extension)) {
+        if (! str_ends_with($filename, $extension)) {
             $filename .= $extension;
         }
 
-        $targetPath = $backupDir . DIRECTORY_SEPARATOR . $filename;
+        $targetPath = $backupDir.DIRECTORY_SEPARATOR.$filename;
 
         try {
             if ($connection === 'sqlite') {
@@ -84,10 +85,11 @@ class DatabaseBackupCommand extends Command
 
             return Command::SUCCESS;
         } catch (Exception $e) {
-            $this->error("Backup failed: " . $e->getMessage());
+            $this->error('Backup failed: '.$e->getMessage());
             if (File::exists($targetPath)) {
                 File::delete($targetPath);
             }
+
             return Command::FAILURE;
         }
     }
@@ -102,10 +104,11 @@ class DatabaseBackupCommand extends Command
         if ($dbPath === ':memory:') {
             // For in-memory sqlite, dump tables using PDO
             $this->backupPdoDump($targetPath, $compress);
+
             return;
         }
 
-        if (!File::exists($dbPath)) {
+        if (! File::exists($dbPath)) {
             throw new Exception("SQLite database file not found at: {$dbPath}");
         }
 
@@ -114,7 +117,7 @@ class DatabaseBackupCommand extends Command
         if ($compress) {
             $compressed = gzencode($content, 9);
             if ($compressed === false) {
-                throw new Exception("Gzip compression failed on SQLite backup content.");
+                throw new Exception('Gzip compression failed on SQLite backup content.');
             }
             File::put($targetPath, $compressed);
         } else {
@@ -130,11 +133,12 @@ class DatabaseBackupCommand extends Command
         // Try mysqldump command first
         if ($this->hasMysqldump()) {
             $this->backupViaMysqldump($targetPath, $compress);
+
             return;
         }
 
         // Fallback to pure PDO dump when mysqldump binary is unavailable
-        $this->info("Notice: mysqldump binary not detected. Using high-compatibility PDO stream dump...");
+        $this->info('Notice: mysqldump binary not detected. Using high-compatibility PDO stream dump...');
         $this->backupPdoDump($targetPath, $compress);
     }
 
@@ -147,7 +151,7 @@ class DatabaseBackupCommand extends Command
         $process = Process::fromShellCommandline($checkCommand);
         $process->run();
 
-        return $process->isSuccessful() && !empty(trim($process->getOutput()));
+        return $process->isSuccessful() && ! empty(trim($process->getOutput()));
     }
 
     /**
@@ -162,14 +166,14 @@ class DatabaseBackupCommand extends Command
         $username = $config['username'];
         $password = $config['password'];
 
-        $tempSqlFile = storage_path('app/backups/_temp_' . uniqid() . '.sql');
+        $tempSqlFile = storage_path('app/backups/_temp_'.uniqid().'.sql');
 
         $command = sprintf(
             'mysqldump --single-transaction --quick --skip-lock-tables --host=%s --port=%s --user=%s %s %s > %s',
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
-            $password ? '--password=' . escapeshellarg($password) : '',
+            $password ? '--password='.escapeshellarg($password) : '',
             escapeshellarg($database),
             escapeshellarg($tempSqlFile)
         );
@@ -178,11 +182,11 @@ class DatabaseBackupCommand extends Command
         $process->setTimeout(600);
         $process->run();
 
-        if (!$process->isSuccessful() || !File::exists($tempSqlFile) || File::size($tempSqlFile) === 0) {
+        if (! $process->isSuccessful() || ! File::exists($tempSqlFile) || File::size($tempSqlFile) === 0) {
             if (File::exists($tempSqlFile)) {
                 File::delete($tempSqlFile);
             }
-            throw new Exception("mysqldump failed: " . $process->getErrorOutput());
+            throw new Exception('mysqldump failed: '.$process->getErrorOutput());
         }
 
         if ($compress) {
@@ -204,15 +208,15 @@ class DatabaseBackupCommand extends Command
         $driver = config('database.default');
 
         $output = "-- DevLoop Database Backup\n";
-        $output .= "-- Generated: " . now()->toIso8601String() . "\n";
-        $output .= "-- Driver: " . $driver . "\n\n";
+        $output .= '-- Generated: '.now()->toIso8601String()."\n";
+        $output .= '-- Driver: '.$driver."\n\n";
 
         if ($driver === 'mysql') {
             $output .= "SET FOREIGN_KEY_CHECKS=0;\n";
             $output .= "SET SQL_MODE=\"NO_AUTO_VALUE_ON_ZERO\";\n\n";
 
             $tables = DB::select("SHOW FULL TABLES WHERE Table_type = 'BASE TABLE'");
-            $key = "Tables_in_" . config('database.connections.mysql.database');
+            $key = 'Tables_in_'.config('database.connections.mysql.database');
 
             foreach ($tables as $tableObj) {
                 $tableName = $tableObj->$key ?? reset($tableObj);
@@ -220,7 +224,7 @@ class DatabaseBackupCommand extends Command
                 $createSql = $createTable->{'Create Table'} ?? '';
 
                 $output .= "DROP TABLE IF EXISTS `{$tableName}`;\n";
-                $output .= $createSql . ";\n\n";
+                $output .= $createSql.";\n\n";
 
                 $rows = DB::table($tableName)->get();
                 if ($rows->count() > 0) {
@@ -247,7 +251,7 @@ class DatabaseBackupCommand extends Command
             foreach ($tables as $table) {
                 $tableName = $table->name;
                 $output .= "DROP TABLE IF EXISTS \"{$tableName}\";\n";
-                $output .= $table->sql . ";\n\n";
+                $output .= $table->sql.";\n\n";
 
                 $rows = DB::table($tableName)->get();
                 foreach ($rows as $row) {
@@ -287,7 +291,7 @@ class DatabaseBackupCommand extends Command
             if ($file->getMTime() < $threshold) {
                 File::delete($file->getRealPath());
                 $deletedCount++;
-                $this->line("Purged expired archive: " . $file->getFilename());
+                $this->line('Purged expired archive: '.$file->getFilename());
             }
         }
 
@@ -307,6 +311,7 @@ class DatabaseBackupCommand extends Command
 
         if (empty($files)) {
             $this->warn("No backup archives found in {$backupDir}.");
+
             return Command::SUCCESS;
         }
 
@@ -340,6 +345,6 @@ class DatabaseBackupCommand extends Command
         $pow = min($pow, count($units) - 1);
         $bytes /= pow(1024, $pow);
 
-        return round($bytes, $precision) . ' ' . $units[$pow];
+        return round($bytes, $precision).' '.$units[$pow];
     }
 }

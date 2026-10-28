@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Enums\TaskStatus;
 use App\Models\Task;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -55,7 +54,7 @@ class TaskDependencyService
         $visited = [];
         $queue = [$fromTaskId];
 
-        while (!empty($queue)) {
+        while (! empty($queue)) {
             $currentId = array_shift($queue);
 
             if ($currentId === $toTaskId) {
@@ -75,7 +74,7 @@ class TaskDependencyService
                 ->all();
 
             foreach ($prerequisites as $prereqId) {
-                if (!isset($visited[$prereqId])) {
+                if (! isset($visited[$prereqId])) {
                     $queue[] = (int) $prereqId;
                 }
             }
@@ -89,6 +88,6 @@ class TaskDependencyService
      */
     public function canMarkDone(Task $task): bool
     {
-        return !$task->isBlocked();
+        return ! $task->isBlocked();
     }
 }

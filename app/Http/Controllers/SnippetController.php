@@ -28,8 +28,8 @@ class SnippetController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%')
-                  ->orWhere('code', 'like', '%' . $search . '%');
+                $q->where('title', 'like', '%'.$search.'%')
+                    ->orWhere('code', 'like', '%'.$search.'%');
             });
         }
 
@@ -46,7 +46,7 @@ class SnippetController extends Controller
     {
         $projects = auth()->user()->allProjects()->get();
         $selectedProject = $request->project_id;
-        
+
         return view('snippets.create', compact('projects', 'selectedProject'));
     }
 

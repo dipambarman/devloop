@@ -27,7 +27,7 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        
+
         if (isset($data['skills'])) {
             // Convert comma-separated string to an array and trim whitespace
             $data['skills'] = array_map('trim', explode(',', $data['skills']));

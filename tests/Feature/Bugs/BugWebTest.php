@@ -93,7 +93,7 @@ it('converts bug into task with correct creator_id and assignee_id', function ()
     $this->bug->update(['assignee_id' => $this->member->id]);
 
     $response = $this->actingAs($this->member)
-                     ->post(route('projects.bugs.convertToTask', [$this->project, $this->bug]));
+        ->post(route('projects.bugs.convertToTask', [$this->project, $this->bug]));
 
     $response->assertRedirect();
 
