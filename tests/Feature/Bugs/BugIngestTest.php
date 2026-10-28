@@ -116,3 +116,37 @@ it('autonomously detects regressions and reopens fixed bugs', function () {
     expect($events[1]->from_status)->toBe('fixed');
     expect($events[1]->to_status)->toBe('open');
 });
+
+it('redacts database credentials, Bearer tokens, and API keys from error messages', function () {
+    $payload = [
+        'message' => 'PDOException: Connection failed: postgres://postgres:super_secret_db_pass123@10.0.0.5:5432/production_db',
+        'stack' => "PDOException: Failed with Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.secret\n    and key sk_live_998877665544332211",
+    ];
+
+    $response = $this->withHeaders(['X-DevLoop-Key' => $this->apiKey])->postJson('/api/v1/ingest', $payload);
+    $response->assertStatus(200);
+
+    $bug = Bug::find($response->json('id'));
+    expect($bug->raw_message)->not->toContain('super_secret_db_pass123');
+    expect($bug->raw_message)->toContain('postgres://postgres:[REDACTED]@10.0.0.5:5432/production_db');
+
+    expect($bug->raw_stack)->not->toContain('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.secret');
+    expect($bug->raw_stack)->toContain('Bearer [REDACTED]');
+
+    expect($bug->raw_stack)->not->toContain('sk_live_998877665544332211');
+    expect($bug->raw_stack)->toContain('[REDACTED_KEY]');
+});
+
+it('enforces rate limiting on headless ingest route', function () {
+    $limiterKey = md5('ingest' . $this->apiKey);
+    for ($i = 0; $i < 300; $i++) {
+        \Illuminate\Support\Facades\RateLimiter::hit($limiterKey);
+    }
+
+    $response = $this->withHeaders(['X-DevLoop-Key' => $this->apiKey])
+                     ->postJson('/api/v1/ingest', [
+                         'message' => 'Rate limit probe error',
+                     ]);
+
+    $response->assertStatus(429);
+});

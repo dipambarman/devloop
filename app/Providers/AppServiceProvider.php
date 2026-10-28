@@ -83,5 +83,11 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('critical', function (Request $request) {
             return Limit::perMinute(5)->by($request->user()?->id ?: $request->ip());
         });
+
+        // Ingest: headless API for error reporting (300 req/min per key/IP).
+        RateLimiter::for('ingest', function (Request $request) {
+            $key = $request->header('X-DevLoop-Key') ?: $request->header('x-api-key') ?: $request->ip();
+            return Limit::perMinute(300)->by($key);
+        });
     }
 }

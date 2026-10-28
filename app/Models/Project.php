@@ -49,6 +49,24 @@ class Project extends Model
             || $this->members()->where('user_id', $user->id)->exists();
     }
 
+    /**
+     * Check if a user can edit project resources (owner or member with non-viewer role).
+     */
+    public function canEdit(User $user): bool
+    {
+        if ($this->owner_id === $user->id) {
+            return true;
+        }
+
+        $member = $this->members()->where('user_id', $user->id)->first();
+        if ($member) {
+            $role = $member->pivot->role ?? 'member';
+            return $role !== 'viewer';
+        }
+
+        return false;
+    }
+
     public function tasks()
     {
         return $this->hasMany(Task::class);

@@ -199,6 +199,11 @@ This document tracks the completion status of every major feature and subsystem 
 | Reporter SDK code generators for JavaScript, Laravel/PHP, and cURL | ✅ |
 | Project Bug list view with status filters, severity pills, and search | ✅ |
 | Bug detail view with full stack trace viewer and interactive timeline | ✅ |
-| "Convert Bug to Kanban Task" one-click bridge | ✅ |
+| Convert Bug to Kanban Task one-click bridge | ✅ |
 | Full Pest automated test coverage (unit + integration + authorization) | ✅ |
+| Headless ingest rate limiting (`throttle:ingest` 300 req/min) | ✅ |
+| Secret redaction engine (DB URIs, Bearer tokens, API keys) | ✅ |
+| High-frequency occurrence event sampling (anti-flooding) | ✅ |
+| Project-role permission enforcement on bug actions (Viewer restrictions) | ✅ |
+| Cross-member task visibility and accessible project filters | ✅ |
 

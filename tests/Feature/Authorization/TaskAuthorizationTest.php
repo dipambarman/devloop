@@ -111,3 +111,22 @@ test('non-member cannot create task in a project they do not belong to (IDOR)', 
     $response->assertStatus(403);
     $this->assertDatabaseMissing('tasks', ['title' => 'Unauthorized Task']);
 });
+
+test('project members can see all tasks in their projects on the tasks index', function () {
+    $owner = User::factory()->create();
+    $member = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $owner->id]);
+    $project->members()->attach($member->id, ['role' => 'member']);
+
+    // Task owned by project, assigned to nobody, created by owner
+    $task = Task::factory()->create([
+        'project_id' => $project->id,
+        'creator_id' => $owner->id,
+        'assignee_id' => null,
+        'title' => 'Shared Team Milestone Task',
+    ]);
+
+    $response = $this->actingAs($member)->get(route('tasks.index'));
+    $response->assertStatus(200);
+    $response->assertSee('Shared Team Milestone Task');
+});

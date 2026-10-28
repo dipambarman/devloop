@@ -88,3 +88,35 @@ it('prevents non-owners from deleting bug', function () {
 
     $response->assertStatus(403);
 });
+
+it('converts bug into task with correct creator_id and assignee_id', function () {
+    $this->bug->update(['assignee_id' => $this->member->id]);
+
+    $response = $this->actingAs($this->member)
+                     ->post(route('projects.bugs.convertToTask', [$this->project, $this->bug]));
+
+    $response->assertRedirect();
+
+    $this->assertDatabaseHas('tasks', [
+        'project_id' => $this->project->id,
+        'creator_id' => $this->member->id,
+        'assignee_id' => $this->member->id,
+        'status' => 'todo',
+    ]);
+});
+
+it('prevents viewers from converting bug to task or updating status', function () {
+    $viewer = User::factory()->create();
+    $this->project->members()->attach($viewer->id, ['role' => 'viewer']);
+
+    // Attempt to update status
+    $resStatus = $this->actingAs($viewer)->patch(route('projects.bugs.updateStatus', [$this->project, $this->bug]), [
+        'status' => 'in_progress',
+        'version' => 0,
+    ]);
+    $resStatus->assertStatus(403);
+
+    // Attempt to convert to task
+    $resTask = $this->actingAs($viewer)->post(route('projects.bugs.convertToTask', [$this->project, $this->bug]));
+    $resTask->assertStatus(403);
+});

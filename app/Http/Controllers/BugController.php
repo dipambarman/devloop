@@ -79,6 +79,7 @@ class BugController extends Controller
     public function store(Request $request, Project $project): RedirectResponse
     {
         Gate::authorize('view', $project);
+        abort_unless($project->canEdit(auth()->user()), 403, 'You do not have permission to manually ingest bugs into this project.');
 
         $validated = $request->validate([
             'message' => ['required', 'string', 'max:5000'],
@@ -103,6 +104,7 @@ class BugController extends Controller
     public function updateStatus(Request $request, Project $project, Bug $bug): RedirectResponse
     {
         Gate::authorize('view', $project);
+        abort_unless($project->canEdit(auth()->user()), 403, 'You do not have permission to update bug status in this project.');
         abort_if($bug->project_id !== $project->id, 404);
 
         $validated = $request->validate([
@@ -126,6 +128,7 @@ class BugController extends Controller
     public function convertToTask(Request $request, Project $project, Bug $bug): RedirectResponse
     {
         Gate::authorize('view', $project);
+        abort_unless($project->canEdit(auth()->user()), 403, 'You do not have permission to convert bugs to tasks in this project.');
         abort_if($bug->project_id !== $project->id, 404);
 
         $priority = match ($bug->severity) {
@@ -146,8 +149,8 @@ class BugController extends Controller
                 . "#### Stack Trace:\n```\n{$bug->raw_stack}\n```",
             'priority' => $priority,
             'status' => 'todo',
-            'created_by' => auth()->id(),
-            'assigned_to' => $bug->assignee_id,
+            'creator_id' => auth()->id(),
+            'assignee_id' => $bug->assignee_id,
         ]);
 
         // Transition bug status to in_progress if currently open

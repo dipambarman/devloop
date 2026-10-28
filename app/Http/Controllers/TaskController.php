@@ -22,7 +22,8 @@ class TaskController extends Controller
     {
         $query = Task::where(function ($q) {
             $q->whereHas('project', function ($pq) {
-                $pq->where('owner_id', auth()->id());
+                $pq->where('owner_id', auth()->id())
+                  ->orWhereHas('members', fn($mq) => $mq->where('users.id', auth()->id()));
             })->orWhere('assignee_id', auth()->id());
         })->with(['assignee', 'project', 'tags']);
 
@@ -47,7 +48,7 @@ class TaskController extends Controller
         }
 
         $tasks = $query->latest()->paginate(15);
-        $projects = auth()->user()->projects()->where('status', ProjectStatus::Active)->get();
+        $projects = auth()->user()->allProjects()->where('status', ProjectStatus::Active)->get();
 
         return view('tasks.index', compact('tasks', 'projects'));
     }
