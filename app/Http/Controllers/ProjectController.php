@@ -83,25 +83,39 @@ class ProjectController extends Controller
     }
 
     /**
-     * Display the Kanban board for the project.
+     * Display the Kanban board for the project with sprint filtering.
      */
-    public function board(Project $project)
+    public function board(\Illuminate\Http\Request $request, Project $project)
     {
         Gate::authorize('view', $project);
 
-        $project->load(['tasks' => function ($query) {
-            $query->with(['assignee', 'tags'])->withCount('comments')->orderBy('order_column')->latest();
-        }]);
+        $sprintFilter = $request->query('sprint', 'all');
+        $sprints = $project->sprints()->latest('created_at')->get();
+        $activeSprint = $project->sprints()->where('status', \App\Enums\SprintStatus::Active)->first();
+
+        $query = $project->tasks()->with(['assignee', 'tags', 'sprint'])->withCount('comments')->orderBy('order_column')->latest();
+
+        if ($sprintFilter === 'active') {
+            if ($activeSprint) {
+                $query->where('sprint_id', $activeSprint->id);
+            }
+        } elseif ($sprintFilter === 'backlog') {
+            $query->whereNull('sprint_id');
+        } elseif (is_numeric($sprintFilter)) {
+            $query->where('sprint_id', (int) $sprintFilter);
+        }
+
+        $tasks = $query->get();
 
         // Group tasks by status
         $tasksByStatus = [
-            'todo' => $project->tasks->where('status', TaskStatus::Todo)->values(),
-            'in_progress' => $project->tasks->where('status', TaskStatus::InProgress)->values(),
-            'review' => $project->tasks->where('status', TaskStatus::Review)->values(),
-            'done' => $project->tasks->where('status', TaskStatus::Done)->values(),
+            'todo' => $tasks->where('status', TaskStatus::Todo)->values(),
+            'in_progress' => $tasks->where('status', TaskStatus::InProgress)->values(),
+            'review' => $tasks->where('status', TaskStatus::Review)->values(),
+            'done' => $tasks->where('status', TaskStatus::Done)->values(),
         ];
 
-        return view('projects.board', compact('project', 'tasksByStatus'));
+        return view('projects.board', compact('project', 'tasksByStatus', 'sprints', 'activeSprint', 'sprintFilter'));
     }
 
     /**

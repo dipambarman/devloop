@@ -15,6 +15,7 @@ class Task extends Model
 
     protected $fillable = [
         'project_id',
+        'sprint_id',
         'title',
         'description',
         'status',
@@ -34,6 +35,11 @@ class Task extends Model
     public function project()
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function sprint()
+    {
+        return $this->belongsTo(Sprint::class);
     }
 
     public function assignee()

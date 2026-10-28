@@ -98,7 +98,7 @@ Expanding the notification system with event-driven alerts and user preferences.
 Features for teams managing larger projects.
 
 - [x] Interactive calendar view for tasks with due dates (`/calendar` & `/projects/{project}/calendar`)
-- [ ] Sprint planning — group tasks into time-boxed sprints
+- [x] Sprint planning & Backlog management (`/projects/{project}/sprints`) — create time-boxed sprints (planning, active, completed), rollover uncompleted tasks, single active sprint constraint, and Kanban board sprint filtering
 - [ ] Milestone tracking — group tasks into release milestones
 - [ ] Task dependencies — mark tasks as blocked by other tasks
 - [ ] Time tracking — log hours spent on tasks

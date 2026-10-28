@@ -18,6 +18,22 @@
             </div>
 
             <div class="flex items-center gap-3 flex-wrap">
+                <a href="{{ route('projects.board', $project) }}">
+                    <x-primary-button class="!bg-primary text-white shadow-md">
+                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                        </svg>
+                        Board
+                    </x-primary-button>
+                </a>
+                <a href="{{ route('projects.sprints.index', $project) }}">
+                    <x-primary-button class="!bg-surface !border-border !text-primary-text hover:!bg-surface-hover">
+                        <svg class="w-4 h-4 mr-2 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Sprints ({{ $project->sprints()->count() }})
+                    </x-primary-button>
+                </a>
                 <a href="{{ route('projects.discussions.index', $project) }}">
                     <x-primary-button class="!bg-surface !border-border !text-primary-text hover:!bg-surface-hover">
                         <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -46,8 +62,50 @@
         </div>
     </x-slot>
 
+    <!-- Sprint Filter Selector Bar -->
+    <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-surface border border-border">
+        <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs font-bold text-secondary-text uppercase tracking-wider mr-1">Sprint View:</span>
+
+            <a href="{{ route('projects.board', [$project, 'sprint' => 'all']) }}" 
+               class="px-3 py-1 text-xs font-semibold rounded-lg transition {{ $sprintFilter === 'all' ? 'bg-primary text-white shadow-sm' : 'bg-background text-secondary-text hover:text-primary-text border border-border' }}">
+                All Tasks
+            </a>
+
+            @if($activeSprint)
+                <a href="{{ route('projects.board', [$project, 'sprint' => 'active']) }}" 
+                   class="px-3 py-1 text-xs font-semibold rounded-lg transition flex items-center gap-1.5 {{ $sprintFilter === 'active' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-background text-secondary-text hover:text-emerald-400 border border-border' }}">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    Active: {{ $activeSprint->name }}
+                </a>
+            @endif
+
+            <a href="{{ route('projects.board', [$project, 'sprint' => 'backlog']) }}" 
+               class="px-3 py-1 text-xs font-semibold rounded-lg transition {{ $sprintFilter === 'backlog' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-background text-secondary-text hover:text-primary-text border border-border' }}">
+                Backlog Only
+            </a>
+
+            @if($sprints->where('status', '!=', \App\Enums\SprintStatus::Active)->isNotEmpty())
+                <form method="GET" action="{{ route('projects.board', $project) }}" class="inline-block">
+                    <select name="sprint" onchange="this.form.submit()" class="text-xs rounded-lg bg-background border border-border text-primary-text py-1 px-2.5 focus:ring-primary">
+                        <option value="">Other Sprints...</option>
+                        @foreach($sprints->where('status', '!=', \App\Enums\SprintStatus::Active) as $sp)
+                            <option value="{{ $sp->id }}" {{ $sprintFilter == $sp->id ? 'selected' : '' }}>
+                                {{ ucfirst($sp->status->value) }}: {{ $sp->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            @endif
+        </div>
+
+        <a href="{{ route('projects.sprints.index', $project) }}" class="text-xs text-primary hover:underline font-semibold flex items-center gap-1">
+            Manage Sprints &rarr;
+        </a>
+    </div>
+
     <!-- Kanban Board Container -->
-    <div class="flex gap-6 h-[calc(100vh-12rem)] overflow-x-auto pb-4" 
+    <div class="flex gap-6 h-[calc(100vh-16rem)] overflow-x-auto pb-4" 
          x-data="kanbanBoard()"
          x-init="initBoard()">
         

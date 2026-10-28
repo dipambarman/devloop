@@ -107,6 +107,16 @@ class Project extends Model
         return $this->hasMany(BugEvent::class);
     }
 
+    public function sprints()
+    {
+        return $this->hasMany(Sprint::class);
+    }
+
+    public function activeSprint()
+    {
+        return $this->hasOne(Sprint::class)->where('status', \App\Enums\SprintStatus::Active);
+    }
+
     /**
      * Generate a new plaintext Ingest API key and save its SHA-256 hash.
      * Returns the plaintext key (displayed only once).

@@ -19,6 +19,8 @@ This document tracks the completion status of every major feature and subsystem 
 | Deployment | 🚧 In Progress | 90% |
 | Email & Multi-Channel Notifications | 🚧 In Progress | 80% |
 | DevLoop Mini (Error Fingerprinting & Regressions) | ✅ Complete | 100% |
+| Sprint Planning & Backlog Management | ✅ Complete | 100% |
+| Advanced Project Management | 🚧 In Progress | 40% |
 | Integrations | 📋 Planned | 0% |
 
 ---
@@ -206,4 +208,21 @@ This document tracks the completion status of every major feature and subsystem 
 | High-frequency occurrence event sampling (anti-flooding) | ✅ |
 | Project-role permission enforcement on bug actions (Viewer restrictions) | ✅ |
 | Cross-member task visibility and accessible project filters | ✅ |
+
+---
+
+## Sprint Planning & Backlog Management
+
+| Feature | Status |
+|---------|--------|
+| Create sprints with name, goal, start date, and end date | ✅ |
+| Sprint lifecycle workflow (Planning → Active → Completed) | ✅ |
+| Project Backlog for unassigned tasks with quick sprint assignment | ✅ |
+| Single active sprint rule per project (with validation alerts) | ✅ |
+| Active sprint progress bar (% done) & countdown badge | ✅ |
+| Rollover logic on sprint completion (return to backlog or roll to next sprint) | ✅ |
+| Kanban board sprint filter (All, Active Sprint, Backlog, Specific Sprint) | ✅ |
+| Navigation tabs integration across Project Overview, Board, and Sprints | ✅ |
+| Role-based permission enforcement (Viewers cannot start/complete sprints) | ✅ |
+| Full Pest automated test coverage for sprint lifecycle and board filtering | ✅ |
 

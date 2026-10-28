@@ -11,6 +11,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectKeyController;
 use App\Http\Controllers\SnippetController;
+use App\Http\Controllers\SprintController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +47,7 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
         Route::get('projects/{project}/discussions/{discussion}', [DiscussionController::class, 'show'])->name('projects.discussions.show');
         Route::get('projects/{project}/bugs', [BugController::class, 'index'])->name('projects.bugs.index');
         Route::get('projects/{project}/bugs/{bug}', [BugController::class, 'show'])->name('projects.bugs.show');
+        Route::get('projects/{project}/sprints', [SprintController::class, 'index'])->name('projects.sprints.index');
     });
 
     Route::resource('projects', ProjectController::class)->only(['index', 'show', 'create', 'edit']);
@@ -84,6 +86,11 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
             Route::post('projects/{project}/bugs/{bug}/convert-to-task', [BugController::class, 'convertToTask'])->name('projects.bugs.convertToTask');
             Route::post('projects/{project}/keys', [ProjectKeyController::class, 'store'])->name('projects.keys.store');
             Route::delete('projects/{project}/keys', [ProjectKeyController::class, 'destroy'])->name('projects.keys.destroy');
+            Route::post('projects/{project}/sprints', [SprintController::class, 'store'])->name('projects.sprints.store');
+            Route::patch('projects/{project}/sprints/{sprint}', [SprintController::class, 'update'])->name('projects.sprints.update');
+            Route::patch('projects/{project}/sprints/{sprint}/start', [SprintController::class, 'start'])->name('projects.sprints.start');
+            Route::patch('projects/{project}/sprints/{sprint}/complete', [SprintController::class, 'complete'])->name('projects.sprints.complete');
+            Route::patch('projects/{project}/tasks/{task}/sprint', [SprintController::class, 'assignTask'])->name('projects.tasks.assignSprint');
         });
 
         Route::patch('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
@@ -119,6 +126,7 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
             Route::delete('projects/{project}/discussions/{discussion}', [DiscussionController::class, 'destroy'])->name('projects.discussions.destroy');
             Route::delete('projects/{project}/discussions/{discussion}/replies/{reply}', [DiscussionController::class, 'destroyReply'])->name('projects.discussions.replies.destroy');
             Route::delete('projects/{project}/bugs/{bug}', [BugController::class, 'destroy'])->name('projects.bugs.destroy');
+            Route::delete('projects/{project}/sprints/{sprint}', [SprintController::class, 'destroy'])->name('projects.sprints.destroy');
         });
     });
 });
