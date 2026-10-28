@@ -58,7 +58,7 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Project $project)
+    public function show(Request $request, Project $project)
     {
         Gate::authorize('view', $project);
 
@@ -68,10 +68,27 @@ class ProjectController extends Controller
 
         $project->load(['members', 'owner']);
 
-        $tasks = $project->tasks()
-            ->with('assignee')
-            ->latest()
-            ->paginate(15);
+        $tasksQuery = $project->tasks()
+            ->with('assignee');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $tasksQuery->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $tasksQuery->where('status', $request->status);
+        }
+
+        $priorityFilter = $request->input('priority') ?? $request->input('severity');
+        if (!empty($priorityFilter)) {
+            $tasksQuery->where('priority', $priorityFilter);
+        }
+
+        $tasks = $tasksQuery->latest()->paginate(15)->withQueryString();
 
         $activities = $project->activityLogs()
             ->with('user', 'subject')
@@ -169,14 +186,23 @@ class ProjectController extends Controller
         Gate::authorize('manageMembers', $project);
 
         $request->validate([
-            'email' => 'required|email',
+            'email' => 'required|string',
             'role' => ['required', Rule::enum(ProjectRole::class)],
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $identifier = trim($request->email);
+        $cleanUsername = ltrim($identifier, '@');
+
+        $user = User::where('email', $identifier)
+            ->orWhere('github_username', $cleanUsername)
+            ->first();
 
         if (!$user) {
-            return redirect()->back()->with('error', 'No user found with that email address.');
+            $errorMessage = (str_contains($identifier, '@') && str_contains($identifier, '.'))
+                ? 'No user found with that email address.'
+                : "No user found with email or GitHub username '{$identifier}'.";
+
+            return redirect()->back()->with('error', $errorMessage);
         }
 
         if ($user->id === $project->owner_id) {

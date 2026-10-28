@@ -99,18 +99,36 @@
             <!-- Tasks Tab -->
             <x-card x-show="activeTab === 'tasks'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
                 <x-slot name="header">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <h3 class="text-lg font-semibold text-primary-text">Tasks</h3>
-                        <div class="flex items-center gap-2">
-                            <x-text-input type="text" placeholder="Search tasks..." class="text-sm py-1.5 w-48" />
-                            <select class="text-sm py-1.5 bg-background border-border text-primary-text rounded-xl focus:border-primary focus:ring-primary">
+                        <form method="GET" action="{{ route('projects.show', $project) }}" class="flex flex-wrap items-center gap-2">
+                            <div class="relative">
+                                <x-text-input type="text" name="search" value="{{ request('search') }}" placeholder="Search tasks..." class="text-xs py-1.5 pl-8 w-36 sm:w-44" />
+                                <svg class="w-3.5 h-3.5 text-secondary-text absolute left-2.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <select name="status" onchange="this.form.submit()" class="text-xs py-1.5 bg-background border-border text-primary-text rounded-xl focus:border-primary focus:ring-primary">
                                 <option value="">All Statuses</option>
-                                <option value="todo">To Do</option>
-                                <option value="in_progress">In Progress</option>
-                                <option value="review">Review</option>
-                                <option value="done">Done</option>
+                                <option value="todo" {{ request('status') === 'todo' ? 'selected' : '' }}>To Do</option>
+                                <option value="in_progress" {{ request('status') === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                <option value="review" {{ request('status') === 'review' ? 'selected' : '' }}>Review</option>
+                                <option value="done" {{ request('status') === 'done' ? 'selected' : '' }}>Done</option>
                             </select>
-                        </div>
+                            @php $pPriority = request('priority', request('severity')); @endphp
+                            <select name="priority" onchange="this.form.submit()" class="text-xs py-1.5 bg-background border-border text-primary-text rounded-xl focus:border-primary focus:ring-primary">
+                                <option value="">All Priorities</option>
+                                <option value="low" {{ $pPriority === 'low' ? 'selected' : '' }}>Low</option>
+                                <option value="medium" {{ $pPriority === 'medium' ? 'selected' : '' }}>Medium</option>
+                                <option value="high" {{ $pPriority === 'high' ? 'selected' : '' }}>High</option>
+                                <option value="urgent" {{ $pPriority === 'urgent' ? 'selected' : '' }}>Urgent</option>
+                            </select>
+                            @if(request()->anyFilled(['search', 'status', 'priority', 'severity']))
+                                <a href="{{ route('projects.show', $project) }}" class="text-xs text-secondary-text hover:text-primary-text underline ml-1">
+                                    Clear
+                                </a>
+                            @endif
+                        </form>
                     </div>
                 </x-slot>
 
@@ -233,15 +251,23 @@
                         </div>
                     </div>
 
-                    <div class="pt-4 border-t border-border" x-data="{ showAddMember: false }">
+                    <div class="pt-4 border-t border-border" x-data="{ showAddMember: false, copied: false }">
                         <div class="flex items-center justify-between mb-2">
-                            <h4 class="text-xs font-semibold text-secondary-text uppercase tracking-wider">Team</h4>
-                            @can('manageMembers', $project)
-                                <button @click="showAddMember = !showAddMember" class="text-xs text-primary hover:text-accent transition-colors font-medium flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                                    Add
+                            <div>
+                                <h4 class="text-xs font-semibold text-secondary-text uppercase tracking-wider">Team Members</h4>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" @click="navigator.clipboard.writeText(window.location.href); copied = true; setTimeout(() => copied = false, 2000)" class="text-[11px] text-secondary-text hover:text-primary-text transition-colors flex items-center gap-1 px-2 py-0.5 rounded border border-border/60 hover:bg-surface-hover" title="Copy project invite link">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                    <span x-text="copied ? 'Copied Link!' : 'Share Link'">Share Link</span>
                                 </button>
-                            @endcan
+                                @can('manageMembers', $project)
+                                    <button @click="showAddMember = !showAddMember" class="text-xs text-primary hover:text-accent transition-colors font-medium flex items-center gap-1 px-2 py-0.5 rounded border border-primary/30 hover:bg-primary/10">
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                        <span x-text="showAddMember ? 'Close' : 'Invite'">Invite</span>
+                                    </button>
+                                @endcan
+                            </div>
                         </div>
 
                         <!-- Add Member Form -->
@@ -250,16 +276,18 @@
                                 <form action="{{ route('projects.addMember', $project) }}" method="POST" class="space-y-3">
                                     @csrf
                                     <div>
-                                        <x-text-input name="email" type="email" placeholder="User email address..." class="w-full text-sm py-1.5" required />
+                                        <label class="block text-[11px] font-medium text-secondary-text mb-1">Teammate Email or GitHub Username</label>
+                                        <x-text-input name="email" type="text" placeholder="e.g. dev@example.com or @username" class="w-full text-xs py-1.5" required />
                                         <x-input-error :messages="$errors->get('email')" class="mt-1" />
                                     </div>
                                     <div class="flex gap-2">
-                                        <select name="role" class="flex-1 text-sm py-1.5 bg-surface border-border text-primary-text rounded-xl focus:border-primary focus:ring-primary">
-                                            <option value="member">Member</option>
-                                            <option value="viewer">Viewer</option>
+                                        <select name="role" class="flex-1 text-xs py-1.5 bg-surface border-border text-primary-text rounded-xl focus:border-primary focus:ring-primary">
+                                            <option value="member">Member (Can edit tasks & board)</option>
+                                            <option value="viewer">Viewer (Read-only)</option>
                                         </select>
-                                        <x-primary-button class="!px-3 !py-1.5 shrink-0">Add</x-primary-button>
+                                        <x-primary-button class="!px-3 !py-1.5 shrink-0 text-xs">Add to Team</x-primary-button>
                                     </div>
+                                    <p class="text-[10px] text-secondary-text">Teammates can log in with GitHub to access the project.</p>
                                 </form>
                             </div>
                         @endcan

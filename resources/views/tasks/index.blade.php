@@ -24,7 +24,11 @@
     </x-slot>
 
     <!-- Filters Bar -->
-    <div x-data="{ showFilters: false }" class="space-y-6">
+    @php
+        $activePriority = request('priority', request('severity'));
+        $hasActiveFilters = request()->hasAny(['status', 'priority', 'severity', 'project_id']);
+    @endphp
+    <div x-data="{ showFilters: {{ $hasActiveFilters ? 'true' : 'false' }} }" class="space-y-6">
         <x-card class="!p-4">
             <form method="GET" action="{{ route('tasks.index') }}" class="space-y-4">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
@@ -41,8 +45,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
                         Filters
-                        @if(request()->hasAny(['status', 'priority', 'project_id']))
-                            <span class="w-2 h-2 rounded-full bg-primary"></span>
+                        @if($hasActiveFilters)
+                            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
                         @endif
                     </button>
 
@@ -50,7 +54,7 @@
                         Search
                     </x-primary-button>
 
-                    @if(request()->hasAny(['search', 'status', 'priority', 'project_id']))
+                    @if(request()->hasAny(['search', 'status', 'priority', 'severity', 'project_id']))
                         <a href="{{ route('tasks.index') }}" class="text-sm text-secondary-text hover:text-primary-text transition-colors">Clear</a>
                     @endif
                 </div>
@@ -59,7 +63,7 @@
                 <div x-show="showFilters" x-collapse class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-border">
                     <div>
                         <x-input-label for="filter_status" value="Status" />
-                        <select id="filter_status" name="status" class="mt-1 block w-full border-border bg-background text-primary-text focus:border-primary focus:ring-primary rounded-xl shadow-sm text-sm">
+                        <select id="filter_status" name="status" onchange="this.form.submit()" class="mt-1 block w-full border-border bg-background text-primary-text focus:border-primary focus:ring-primary rounded-xl shadow-sm text-sm">
                             <option value="">All Statuses</option>
                             <option value="todo" {{ request('status') === 'todo' ? 'selected' : '' }}>To Do</option>
                             <option value="in_progress" {{ request('status') === 'in_progress' ? 'selected' : '' }}>In Progress</option>
@@ -68,18 +72,18 @@
                         </select>
                     </div>
                     <div>
-                        <x-input-label for="filter_priority" value="Priority" />
-                        <select id="filter_priority" name="priority" class="mt-1 block w-full border-border bg-background text-primary-text focus:border-primary focus:ring-primary rounded-xl shadow-sm text-sm">
+                        <x-input-label for="filter_priority" value="Priority / Severity" />
+                        <select id="filter_priority" name="priority" onchange="this.form.submit()" class="mt-1 block w-full border-border bg-background text-primary-text focus:border-primary focus:ring-primary rounded-xl shadow-sm text-sm">
                             <option value="">All Priorities</option>
-                            <option value="low" {{ request('priority') === 'low' ? 'selected' : '' }}>Low</option>
-                            <option value="medium" {{ request('priority') === 'medium' ? 'selected' : '' }}>Medium</option>
-                            <option value="high" {{ request('priority') === 'high' ? 'selected' : '' }}>High</option>
-                            <option value="urgent" {{ request('priority') === 'urgent' ? 'selected' : '' }}>Urgent</option>
+                            <option value="low" {{ $activePriority === 'low' ? 'selected' : '' }}>Low</option>
+                            <option value="medium" {{ $activePriority === 'medium' ? 'selected' : '' }}>Medium</option>
+                            <option value="high" {{ $activePriority === 'high' ? 'selected' : '' }}>High</option>
+                            <option value="urgent" {{ $activePriority === 'urgent' ? 'selected' : '' }}>Urgent</option>
                         </select>
                     </div>
                     <div>
                         <x-input-label for="filter_project" value="Project" />
-                        <select id="filter_project" name="project_id" class="mt-1 block w-full border-border bg-background text-primary-text focus:border-primary focus:ring-primary rounded-xl shadow-sm text-sm">
+                        <select id="filter_project" name="project_id" onchange="this.form.submit()" class="mt-1 block w-full border-border bg-background text-primary-text focus:border-primary focus:ring-primary rounded-xl shadow-sm text-sm">
                             <option value="">All Projects</option>
                             @foreach($projects as $project)
                                 <option value="{{ $project->id }}" {{ request('project_id') == $project->id ? 'selected' : '' }}>{{ $project->name }}</option>

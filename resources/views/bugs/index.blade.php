@@ -386,6 +386,9 @@ $exceptions->reportable(function (Throwable $e) {
         <!-- Filter and Search Bar -->
         <div class="card p-4 rounded-xl border border-border bg-surface shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
             <form method="GET" action="{{ route('projects.bugs.index', $project) }}" class="flex flex-wrap items-center gap-3 w-full">
+                @if(request()->filled('status'))
+                    <input type="hidden" name="status" value="{{ request('status') }}">
+                @endif
                 <!-- Status Filter -->
                 <div class="flex items-center gap-1 bg-background p-1 rounded-lg border border-border text-xs">
                     <a href="{{ route('projects.bugs.index', array_merge(['project' => $project], request()->except('status'))) }}"

@@ -188,3 +188,21 @@ test('cannot remove project owner as member', function () {
     $response->assertRedirect();
     $response->assertSessionHas('error', 'Cannot remove the project owner.');
 });
+
+test('project owner can add a member by github username with or without leading at-symbol', function () {
+    $owner = User::factory()->create();
+    $teammate = User::factory()->create(['github_username' => 'octowiz']);
+    $project = Project::factory()->create(['owner_id' => $owner->id]);
+
+    $response = $this->actingAs($owner)->post(route('projects.addMember', $project), [
+        'email' => '@octowiz',
+        'role' => ProjectRole::Member->value,
+    ]);
+
+    $response->assertRedirect();
+    $this->assertDatabaseHas('project_user', [
+        'project_id' => $project->id,
+        'user_id' => $teammate->id,
+        'role' => ProjectRole::Member->value,
+    ]);
+});

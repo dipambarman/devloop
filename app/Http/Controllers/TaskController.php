@@ -39,15 +39,16 @@ class TaskController extends Controller
             $query->where('status', $request->status);
         }
 
-        if ($request->filled('priority')) {
-            $query->where('priority', $request->priority);
+        $priorityFilter = $request->input('priority') ?? $request->input('severity');
+        if (!empty($priorityFilter)) {
+            $query->where('priority', $priorityFilter);
         }
 
         if ($request->filled('project_id')) {
             $query->where('project_id', $request->project_id);
         }
 
-        $tasks = $query->latest()->paginate(15);
+        $tasks = $query->latest()->paginate(15)->withQueryString();
         $projects = auth()->user()->allProjects()->where('status', ProjectStatus::Active)->get();
 
         return view('tasks.index', compact('tasks', 'projects'));
