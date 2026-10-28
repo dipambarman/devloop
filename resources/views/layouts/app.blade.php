@@ -63,6 +63,9 @@
             </div>
         </div>
         
+        <!-- Global Command Palette (Ctrl+K / Cmd+K) -->
+        <x-command-palette />
+
         {{ $scripts ?? '' }}
 
         <script>

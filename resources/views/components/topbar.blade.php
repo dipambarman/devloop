@@ -7,17 +7,21 @@
             </svg>
         </button>
 
-        <!-- Search -->
-        <div class="flex-1 max-w-xl">
-            <div class="relative group">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-secondary-text group-focus-within:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <!-- Command Palette Trigger Bar (Ctrl+K) -->
+        <button type="button" 
+                @click="window.dispatchEvent(new CustomEvent('open-command-palette'))" 
+                class="flex-1 max-w-md w-full flex items-center justify-between pl-3 pr-2.5 py-1.5 rounded-xl border border-border/70 bg-background/80 hover:bg-surface-hover hover:border-primary/40 text-secondary-text hover:text-primary-text transition-all group shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40 text-left"
+        >
+            <div class="flex items-center gap-2.5 min-w-0">
+                <svg class="h-4 w-4 text-secondary-text group-hover:text-primary transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
+                <span class="text-xs text-secondary-text group-hover:text-primary-text truncate">Search projects, tasks, errors, or actions...</span>
             </div>
-            <input type="text" class="block w-full pl-10 pr-3 py-2 border border-transparent rounded-lg leading-5 bg-background text-primary-text placeholder-secondary-text focus:outline-none focus:bg-surface focus:border-primary focus:ring-1 focus:ring-primary sm:text-sm transition-all" placeholder="Search projects, tasks, notes...">
-        </div>
-    </div>
+            <div class="hidden sm:flex items-center gap-1 shrink-0 ml-2">
+                <kbd class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface border border-border text-secondary-text group-hover:border-primary/40 group-hover:text-primary transition-colors">Ctrl K</kbd>
+            </div>
+        </button>
     </div>
 
     <!-- Right side (Notifications & Profile Dropdown) -->

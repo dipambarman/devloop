@@ -82,7 +82,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Search: filter/search endpoints that are query-intensive.
         RateLimiter::for('search', function (Request $request) {
-            return Limit::perMinute(20)->by($request->user()?->id ?: $request->ip());
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
         // Upload: heavy creation operations (new projects, notes, snippets).
