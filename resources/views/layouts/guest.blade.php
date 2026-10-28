@@ -23,11 +23,7 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
             <div class="z-10">
                 <a href="/" class="flex items-center gap-3 group">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg group-hover:shadow-primary/50 transition-all duration-300 transform group-hover:scale-105">
-                        <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                        </svg>
-                    </div>
+                    <img src="{{ asset('images/logo.png') }}" alt="DevLoop" class="w-12 h-12 rounded-xl shadow-lg ring-1 ring-white/15 group-hover:shadow-primary/50 transition-all duration-300 transform group-hover:scale-105 object-cover">
                     <span class="text-2xl font-bold tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-accent transition-all duration-300">
                         DevLoop
                     </span>
