@@ -223,6 +223,47 @@
                     <pre id="raw_stack_block" class="p-4 bg-black/70 rounded-lg border border-border font-mono text-xs text-slate-300 overflow-x-auto max-h-96"><code>{{ $bug->raw_stack }}</code></pre>
                 </div>
             @endif
+
+            <!-- Telemetry & Diagnostic Context -->
+            <div class="pt-4 border-t border-border grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div>
+                    <span class="text-secondary-text font-semibold uppercase tracking-wider block mb-1">Environment</span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded font-mono font-bold
+                        @if($bug->environment === 'production') bg-red-500/10 text-red-400 border border-red-500/20
+                        @elseif($bug->environment === 'staging') bg-amber-500/10 text-amber-400 border border-amber-500/20
+                        @else bg-blue-500/10 text-blue-400 border border-blue-500/20
+                        @endif">
+                        {{ $bug->environment ?: 'production' }}
+                    </span>
+                </div>
+
+                @if($bug->url)
+                    <div class="md:col-span-2">
+                        <span class="text-secondary-text font-semibold uppercase tracking-wider block mb-1">Source URL / Request Route</span>
+                        <div class="font-mono text-primary-text bg-background p-2 rounded border border-border truncate" title="{{ $bug->url }}">
+                            {{ $bug->url }}
+                        </div>
+                    </div>
+                @endif
+
+                @if($bug->user_agent)
+                    <div class="md:col-span-3">
+                        <span class="text-secondary-text font-semibold uppercase tracking-wider block mb-1">User Agent / Client Runtime</span>
+                        <div class="font-mono text-[11px] text-secondary-text bg-background p-2 rounded border border-border break-all">
+                            {{ $bug->user_agent }}
+                        </div>
+                    </div>
+                @endif
+
+                @if(!empty($bug->context))
+                    <div class="md:col-span-3">
+                        <span class="text-secondary-text font-semibold uppercase tracking-wider block mb-1">Custom Context & Diagnostics</span>
+                        <div class="p-3 bg-background rounded-lg border border-border font-mono text-xs text-emerald-300 overflow-x-auto">
+                            <pre><code>{{ json_encode($bug->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</code></pre>
+                        </div>
+                    </div>
+                @endif
+            </div>
         </div>
 
         <!-- Immutable Event Timeline -->

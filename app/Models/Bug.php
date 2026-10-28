@@ -19,12 +19,16 @@ class Bug extends Model
         'error_type',
         'status',
         'severity',
+        'environment',
         'assignee_id',
         'occurrence_count',
         'regressions',
         'last_seen_at',
         'raw_message',
         'raw_stack',
+        'url',
+        'user_agent',
+        'context',
         'version',
     ];
 
@@ -33,6 +37,7 @@ class Bug extends Model
         'occurrence_count' => 'integer',
         'regressions' => 'integer',
         'version' => 'integer',
+        'context' => 'array',
     ];
 
     public function project(): BelongsTo

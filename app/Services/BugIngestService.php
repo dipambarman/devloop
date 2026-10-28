@@ -22,17 +22,39 @@ class BugIngestService
         Project $project,
         string $message,
         ?string $stack = null,
-        string $severity = 'medium'
+        string $severity = 'medium',
+        string $environment = 'production',
+        ?string $url = null,
+        ?string $userAgent = null,
+        ?array $context = null,
+        bool $handled = false
     ): Bug {
         $cleanMessage = $this->redactSecrets($message) ?? '';
         $cleanStack = $this->redactSecrets($stack);
+        $cleanContext = $this->redactArray($context);
+        $environment = mb_substr(trim(strtolower($environment ?: 'production')), 0, 50);
+        $url = $url ? mb_substr(trim($url), 0, 2048) : null;
+        $userAgent = $userAgent ? mb_substr(trim($userAgent), 0, 512) : null;
 
         $errorType = $this->fingerprintService->extractErrorType($cleanMessage);
         $fingerprint = $this->fingerprintService->computeFingerprint($cleanMessage, $errorType, $cleanStack);
         $normalized = $this->fingerprintService->normalizeMessage($cleanMessage);
         $title = mb_substr($normalized ?: ($errorType ?: 'Unhandled Error'), 0, 120);
 
-        return DB::transaction(function () use ($project, $fingerprint, $title, $errorType, $severity, $cleanMessage, $cleanStack) {
+        return DB::transaction(function () use (
+            $project,
+            $fingerprint,
+            $title,
+            $errorType,
+            $severity,
+            $environment,
+            $url,
+            $userAgent,
+            $cleanMessage,
+            $cleanStack,
+            $cleanContext,
+            $handled
+        ) {
             $now = now();
 
             $bug = Bug::where('project_id', $project->id)
@@ -58,7 +80,10 @@ class BugIngestService
                         'from_status' => 'fixed',
                         'to_status' => 'open',
                         'user_id' => null,
-                        'metadata' => ['reason' => 'automatic_regression_detected'],
+                        'metadata' => [
+                            'reason' => 'automatic_regression_detected',
+                            'environment' => $environment,
+                        ],
                         'created_at' => $now->copy()->subMillisecond(),
                     ]);
                 }
@@ -67,6 +92,16 @@ class BugIngestService
                 $bug->last_seen_at = $now;
                 $bug->raw_message = $cleanMessage;
                 $bug->raw_stack = $cleanStack;
+                $bug->environment = $environment ?: $bug->environment;
+                if ($url) {
+                    $bug->url = $url;
+                }
+                if ($userAgent) {
+                    $bug->user_agent = $userAgent;
+                }
+                if ($cleanContext) {
+                    $bug->context = array_merge($bug->context ?? [], $cleanContext);
+                }
                 $bug->save();
             } else {
                 $bug = Bug::create([
@@ -76,6 +111,10 @@ class BugIngestService
                     'error_type' => $errorType,
                     'status' => 'open',
                     'severity' => in_array($severity, ['low', 'medium', 'high', 'critical']) ? $severity : 'medium',
+                    'environment' => $environment ?: 'production',
+                    'url' => $url,
+                    'user_agent' => $userAgent,
+                    'context' => $cleanContext,
                     'occurrence_count' => 1,
                     'regressions' => 0,
                     'last_seen_at' => $now,
@@ -87,11 +126,19 @@ class BugIngestService
 
             // Append occurrence event to immutable timeline (sampled for high-frequency crashes)
             if ($this->shouldRecordOccurrence($bug->occurrence_count, $isRegression)) {
+                $eventMetadata = array_filter([
+                    'environment' => $environment,
+                    'url' => $url,
+                    'handled' => $handled,
+                    'context' => $cleanContext,
+                ], fn ($val) => !is_null($val));
+
                 BugEvent::create([
                     'bug_id' => $bug->id,
                     'project_id' => $project->id,
                     'type' => 'occurrence',
                     'occurrence_count' => $bug->occurrence_count,
+                    'metadata' => !empty($eventMetadata) ? $eventMetadata : null,
                     'created_at' => $now,
                 ]);
             }
@@ -123,6 +170,36 @@ class BugIngestService
         $text = preg_replace('/\b(sk_live_[a-zA-Z0-9]+|ghp_[a-zA-Z0-9]+|dl_ingest_[a-zA-Z0-9]+|AKIA[0-9A-Z]{16})\b/', '[REDACTED_KEY]', $text);
 
         return $text;
+    }
+
+    /**
+     * Recursively redact sensitive keys and values in context arrays.
+     */
+    public function redactArray(?array $data): ?array
+    {
+        if (empty($data)) {
+            return $data;
+        }
+
+        $sensitiveKeyRegex = '/^(password|passwd|secret|token|api_key|auth|authorization|cookie|session|credit_card|cvv)$/i';
+        $cleaned = [];
+
+        foreach ($data as $key => $value) {
+            if (is_string($key) && preg_match($sensitiveKeyRegex, $key)) {
+                $cleaned[$key] = '[REDACTED]';
+                continue;
+            }
+
+            if (is_array($value)) {
+                $cleaned[$key] = $this->redactArray($value);
+            } elseif (is_string($value)) {
+                $cleaned[$key] = $this->redactSecrets($value);
+            } else {
+                $cleaned[$key] = $value;
+            }
+        }
+
+        return $cleaned;
     }
 
     /**

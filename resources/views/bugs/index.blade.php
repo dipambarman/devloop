@@ -182,51 +182,141 @@
                                 </div>
 
                                 <!-- Code Snippet Tabs -->
-                                <div class="flex gap-2 border-b border-border pb-2 mb-3">
-                                    <button @click="tab = 'js'" :class="tab === 'js' ? 'text-primary border-primary' : 'text-secondary-text border-transparent'" class="px-3 py-1 text-xs font-semibold border-b-2 transition">JavaScript / React</button>
-                                    <button @click="tab = 'php'" :class="tab === 'php' ? 'text-primary border-primary' : 'text-secondary-text border-transparent'" class="px-3 py-1 text-xs font-semibold border-b-2 transition">Laravel / PHP</button>
-                                    <button @click="tab = 'curl'" :class="tab === 'curl' ? 'text-primary border-primary' : 'text-secondary-text border-transparent'" class="px-3 py-1 text-xs font-semibold border-b-2 transition">cURL / HTTP</button>
+                                <div class="flex gap-2 border-b border-border pb-2 mb-3 overflow-x-auto">
+                                    <button @click="tab = 'browser'" :class="tab === 'browser' ? 'text-primary border-primary' : 'text-secondary-text border-transparent'" class="px-3 py-1 text-xs font-semibold border-b-2 transition whitespace-nowrap">🌐 Browser Script (Zero-Config)</button>
+                                    <button @click="tab = 'react'" :class="tab === 'react' ? 'text-primary border-primary' : 'text-secondary-text border-transparent'" class="px-3 py-1 text-xs font-semibold border-b-2 transition whitespace-nowrap">⚡ React / Next.js / Vue</button>
+                                    <button @click="tab = 'laravel'" :class="tab === 'laravel' ? 'text-primary border-primary' : 'text-secondary-text border-transparent'" class="px-3 py-1 text-xs font-semibold border-b-2 transition whitespace-nowrap">🐘 Laravel 11 / PHP</button>
+                                    <button @click="tab = 'curl'" :class="tab === 'curl' ? 'text-primary border-primary' : 'text-secondary-text border-transparent'" class="px-3 py-1 text-xs font-semibold border-b-2 transition whitespace-nowrap">📡 cURL & Async API</button>
                                 </div>
 
-                                <div x-show="tab === 'js'" class="relative">
-                                    <pre class="p-3.5 bg-black/60 rounded-lg text-xs font-mono text-slate-300 overflow-x-auto border border-border"><code>window.addEventListener('error', (event) => {
-  fetch('{{ url('/api/v1/ingest') }}', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-DevLoop-Key': 'YOUR_INGEST_KEY_HERE',
-    },
-    body: JSON.stringify({
-      message: event.message,
-      stack: event.error ? event.error.stack : null,
-      severity: 'high'
-    })
-  }).catch(() => {});
-});</code></pre>
+                                <!-- Browser Script Tab -->
+                                <div x-show="tab === 'browser'" class="space-y-3">
+                                    <p class="text-xs text-secondary-text">Paste this single tag before the closing <code>&lt;/head&gt;</code> or <code>&lt;/body&gt;</code> tag of any web application. Automatically captures runtime crashes, unhandled promises, and viewport telemetry with client-side deduplication.</p>
+                                    <pre class="p-3.5 bg-black/60 rounded-lg text-xs font-mono text-slate-300 overflow-x-auto border border-border"><code>&lt;!-- DevLoop Client Error Listener --&gt;
+&lt;script 
+  src="{{ url('/js/devloop-tracker.js') }}" 
+  data-key="{{ session('plaintext_key') ?? 'YOUR_INGEST_KEY_HERE' }}"
+  data-endpoint="{{ url('/api/v1/ingest') }}"
+  data-environment="production"&gt;
+&lt;/script&gt;</code></pre>
                                 </div>
 
-                                <div x-show="tab === 'php'" style="display: none;" class="relative">
-                                    <pre class="p-3.5 bg-black/60 rounded-lg text-xs font-mono text-slate-300 overflow-x-auto border border-border"><code>// In bootstrap/app.php or app/Exceptions/Handler.php:
+                                <!-- React / Vue / JS Tab -->
+                                <div x-show="tab === 'react'" style="display: none;" class="space-y-3">
+                                    <p class="text-xs text-secondary-text">Initialize programmatically inside <code>main.jsx</code>, <code>index.js</code>, or your App entrypoint.</p>
+                                    <pre class="p-3.5 bg-black/60 rounded-lg text-xs font-mono text-slate-300 overflow-x-auto border border-border"><code>// 1. Initialize Tracker
+DevLoop.init({
+  key: '{{ session('plaintext_key') ?? 'YOUR_INGEST_KEY_HERE' }}',
+  endpoint: '{{ url('/api/v1/ingest') }}',
+  environment: process.env.NODE_ENV || 'production',
+  release: 'v1.0.0'
+});
+
+// 2. Set Current User Context (Optional)
+DevLoop.setUser({ id: 42, email: 'user@example.com' });
+
+// 3. Manual Error Capture (Try / Catch or Error Boundary)
+try {
+  runRiskyOperation();
+} catch (error) {
+  DevLoop.captureException(error, {
+    severity: 'critical',
+    context: { feature: 'checkout_modal' }
+  });
+}</code></pre>
+                                </div>
+
+                                <!-- Laravel / PHP Tab -->
+                                <div x-show="tab === 'laravel'" style="display: none;" class="space-y-3">
+                                    <p class="text-xs text-secondary-text">Use the built-in <code>App\Support\DevLoopReporter</code> helper in <code>bootstrap/app.php</code>:</p>
+                                    <pre class="p-3.5 bg-black/60 rounded-lg text-xs font-mono text-slate-300 overflow-x-auto border border-border"><code>// In bootstrap/app.php (Laravel 11)
+use App\Support\DevLoopReporter;
+
 $exceptions->reportable(function (Throwable $e) {
-    \Illuminate\Support\Facades\Http::withHeaders([
-        'X-DevLoop-Key' => 'YOUR_INGEST_KEY_HERE',
-    ])->post('{{ url('/api/v1/ingest') }}', [
-        'message' => get_class($e) . ': ' . $e->getMessage(),
-        'stack' => $e->getTraceAsString(),
-        'severity' => 'critical',
-    ]);
+    DevLoopReporter::report(
+        $e,
+        apiKey: '{{ session('plaintext_key') ?? 'YOUR_INGEST_KEY_HERE' }}',
+        endpoint: '{{ url('/api/v1/ingest') }}'
+    );
 });</code></pre>
                                 </div>
 
-                                <div x-show="tab === 'curl'" style="display: none;" class="relative">
+                                <!-- cURL / Async API Tab -->
+                                <div x-show="tab === 'curl'" style="display: none;" class="space-y-3">
+                                    <p class="text-xs text-secondary-text">Send single or batched error events. Add <code>X-DevLoop-Async: 1</code> header for high-throughput background queueing (202 Accepted):</p>
                                     <pre class="p-3.5 bg-black/60 rounded-lg text-xs font-mono text-slate-300 overflow-x-auto border border-border"><code>curl -X POST "{{ url('/api/v1/ingest') }}" \
   -H "Content-Type: application/json" \
-  -H "X-DevLoop-Key: YOUR_INGEST_KEY_HERE" \
+  -H "X-DevLoop-Key: {{ session('plaintext_key') ?? 'YOUR_INGEST_KEY_HERE' }}" \
+  -H "X-DevLoop-Async: 1" \
   -d '{
-    "message": "TypeError: Cannot read properties of undefined",
-    "stack": "at render (/app/src/index.js:42:15)",
-    "severity": "high"
+    "message": "DatabaseTimeout: Connection to replica timed out",
+    "stack": "at DB.query (/var/www/src/db.js:84:12)",
+    "severity": "critical",
+    "environment": "production",
+    "url": "https://api.myapp.com/v1/orders",
+    "context": { "retry_count": 3, "service": "orders" }
   }'</code></pre>
+                                </div>
+
+                                <!-- Live Ingest Ping Test Utility -->
+                                <div class="mt-5 p-4 rounded-lg bg-surface-hover border border-border space-y-3"
+                                     x-data="{ pingKey: '{{ session('plaintext_key') ?? '' }}', pingStatus: null, pingLoading: false }">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <span class="text-xs font-bold text-primary-text block">Live Ingest Ping Test</span>
+                                            <span class="text-[11px] text-secondary-text">Verify that your ingest pipeline and error listener are working right now.</span>
+                                        </div>
+                                        <button type="button" 
+                                                :disabled="pingLoading || !pingKey"
+                                                @click="
+                                                    pingLoading = true;
+                                                    pingStatus = 'Sending test error ping...';
+                                                    fetch('{{ url('/api/v1/ingest') }}', {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'Content-Type': 'application/json',
+                                                            'X-DevLoop-Key': pingKey,
+                                                            'X-DevLoop-Async': '0'
+                                                        },
+                                                        body: JSON.stringify({
+                                                            message: 'TestError: DevLoop Ingest Live Verification Ping',
+                                                            stack: 'at DevLoopSdkModal.testPing (' + window.location.href + ':1:1)',
+                                                            severity: 'medium',
+                                                            environment: 'local',
+                                                            url: window.location.href,
+                                                            context: { test: true, initiated_at: new Date().toISOString() }
+                                                        })
+                                                    })
+                                                    .then(res => res.json().then(data => ({ ok: res.ok, data })))
+                                                    .then(result => {
+                                                        pingLoading = false;
+                                                        if (result.ok) {
+                                                            pingStatus = '✓ Success! Ingested error #' + result.data.fingerprint + ' (' + result.data.title + '). Reloading...';
+                                                            setTimeout(() => window.location.reload(), 1500);
+                                                        } else {
+                                                            pingStatus = '✗ Failed: ' + (result.data.error || 'Check your key');
+                                                        }
+                                                    })
+                                                    .catch(err => {
+                                                        pingLoading = false;
+                                                        pingStatus = '✗ Network Error: ' + err.message;
+                                                    });
+                                                "
+                                                class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white transition">
+                                            <span x-show="!pingLoading">Send Test Ping</span>
+                                            <span x-show="pingLoading" style="display: none;">Sending...</span>
+                                        </button>
+                                    </div>
+
+                                    @if(!session('plaintext_key'))
+                                        <div>
+                                            <label class="block text-[11px] text-secondary-text mb-1">Enter your active Ingest Key to test:</label>
+                                            <input type="text" x-model="pingKey" placeholder="dl_ingest_..." 
+                                                   class="w-full text-xs font-mono bg-background border border-border rounded px-2.5 py-1 text-primary-text">
+                                        </div>
+                                    @endif
+
+                                    <div x-show="pingStatus" class="text-xs font-medium" :class="pingStatus && pingStatus.startsWith('✓') ? 'text-emerald-400' : (pingStatus && pingStatus.startsWith('✗') ? 'text-red-400' : 'text-blue-400')" x-text="pingStatus"></div>
                                 </div>
 
                                 <div class="flex justify-end pt-4 mt-2">
