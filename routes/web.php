@@ -9,10 +9,13 @@ use App\Http\Controllers\NoteController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\MilestoneController;
 use App\Http\Controllers\ProjectKeyController;
 use App\Http\Controllers\SnippetController;
 use App\Http\Controllers\SprintController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskDependencyController;
+use App\Http\Controllers\TimeLogController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -48,6 +51,8 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
         Route::get('projects/{project}/bugs', [BugController::class, 'index'])->name('projects.bugs.index');
         Route::get('projects/{project}/bugs/{bug}', [BugController::class, 'show'])->name('projects.bugs.show');
         Route::get('projects/{project}/sprints', [SprintController::class, 'index'])->name('projects.sprints.index');
+        Route::get('projects/{project}/milestones', [MilestoneController::class, 'index'])->name('projects.milestones.index');
+        Route::get('projects/{project}/time-report', [TimeLogController::class, 'report'])->name('projects.time-report');
     });
 
     Route::resource('projects', ProjectController::class)->only(['index', 'show', 'create', 'edit']);
@@ -91,6 +96,12 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
             Route::patch('projects/{project}/sprints/{sprint}/start', [SprintController::class, 'start'])->name('projects.sprints.start');
             Route::patch('projects/{project}/sprints/{sprint}/complete', [SprintController::class, 'complete'])->name('projects.sprints.complete');
             Route::patch('projects/{project}/tasks/{task}/sprint', [SprintController::class, 'assignTask'])->name('projects.tasks.assignSprint');
+            Route::post('projects/{project}/milestones', [MilestoneController::class, 'store'])->name('projects.milestones.store');
+            Route::patch('projects/{project}/milestones/{milestone}', [MilestoneController::class, 'update'])->name('projects.milestones.update');
+            Route::patch('projects/{project}/milestones/{milestone}/toggle', [MilestoneController::class, 'toggleStatus'])->name('projects.milestones.toggleStatus');
+            Route::patch('projects/{project}/tasks/{task}/milestone', [MilestoneController::class, 'assignTask'])->name('projects.tasks.assignMilestone');
+            Route::post('projects/{project}/tasks/{task}/dependencies', [TaskDependencyController::class, 'store'])->name('projects.tasks.dependencies.store');
+            Route::post('projects/{project}/tasks/{task}/time-logs', [TimeLogController::class, 'store'])->name('projects.tasks.timeLogs.store');
         });
 
         Route::patch('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
@@ -127,6 +138,9 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
             Route::delete('projects/{project}/discussions/{discussion}/replies/{reply}', [DiscussionController::class, 'destroyReply'])->name('projects.discussions.replies.destroy');
             Route::delete('projects/{project}/bugs/{bug}', [BugController::class, 'destroy'])->name('projects.bugs.destroy');
             Route::delete('projects/{project}/sprints/{sprint}', [SprintController::class, 'destroy'])->name('projects.sprints.destroy');
+            Route::delete('projects/{project}/milestones/{milestone}', [MilestoneController::class, 'destroy'])->name('projects.milestones.destroy');
+            Route::delete('projects/{project}/tasks/{task}/dependencies/{dependency}', [TaskDependencyController::class, 'destroy'])->name('projects.tasks.dependencies.destroy');
+            Route::delete('projects/{project}/tasks/{task}/time-logs/{timeLog}', [TimeLogController::class, 'destroy'])->name('projects.tasks.timeLogs.destroy');
         });
     });
 });

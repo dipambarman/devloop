@@ -99,9 +99,9 @@ Features for teams managing larger projects.
 
 - [x] Interactive calendar view for tasks with due dates (`/calendar` & `/projects/{project}/calendar`)
 - [x] Sprint planning & Backlog management (`/projects/{project}/sprints`) — create time-boxed sprints (planning, active, completed), rollover uncompleted tasks, single active sprint constraint, and Kanban board sprint filtering
-- [ ] Milestone tracking — group tasks into release milestones
-- [ ] Task dependencies — mark tasks as blocked by other tasks
-- [ ] Time tracking — log hours spent on tasks
+- [x] Milestone tracking (`/projects/{project}/milestones`) — target release milestones, due dates, completion percentages, task assignment/unlinking, open/closed archives
+- [x] Task dependencies — prerequisite blocker graph with cycle detection ($O(V + E)$ BFS) to prevent circular dependency deadlocks, visual blocker alert banner
+- [x] Time tracking (`/projects/{project}/time-report`) — log hours and minutes on tasks, estimate vs. logged progress comparison, and project-wide team time report
 - [ ] Recurring tasks — auto-create tasks on a schedule
 - [ ] Bulk task operations — multi-select and batch update
 

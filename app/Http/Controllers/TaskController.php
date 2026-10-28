@@ -107,10 +107,31 @@ class TaskController extends Controller
     {
         Gate::authorize('view', $task);
 
-        $task->load(['project', 'assignee', 'creator', 'tags', 'comments.user']);
+        $task->load([
+            'project',
+            'assignee',
+            'creator',
+            'tags',
+            'comments.user',
+            'milestone',
+            'dependencies',
+            'dependents',
+            'timeLogs.user',
+        ]);
+
         $projectMembers = $task->project->members()->get()->push($task->project->owner)->unique('id');
 
-        return view('tasks.show', compact('task', 'projectMembers'));
+        $existingDependencyIds = $task->dependencies->pluck('id')->push($task->id)->all();
+        $availablePrerequisites = $task->project->tasks()
+            ->whereNotIn('id', $existingDependencyIds)
+            ->orderBy('title')
+            ->get(['id', 'title', 'status']);
+
+        $projectMilestones = $task->project->milestones()
+            ->where('status', \App\Enums\MilestoneStatus::Open)
+            ->get();
+
+        return view('tasks.show', compact('task', 'projectMembers', 'availablePrerequisites', 'projectMilestones'));
     }
 
     /**

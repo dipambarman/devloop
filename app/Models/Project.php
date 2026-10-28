@@ -117,6 +117,19 @@ class Project extends Model
         return $this->hasOne(Sprint::class)->where('status', \App\Enums\SprintStatus::Active);
     }
 
+    public function milestones()
+    {
+        return $this->hasMany(Milestone::class);
+    }
+
+    public function totalLoggedHours(): float
+    {
+        $minutes = TimeLog::whereHas('task', fn($q) => $q->where('project_id', $this->id))
+            ->sum('duration_minutes');
+
+        return round($minutes / 60, 2);
+    }
+
     /**
      * Generate a new plaintext Ingest API key and save its SHA-256 hash.
      * Returns the plaintext key (displayed only once).

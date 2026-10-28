@@ -226,3 +226,46 @@ This document tracks the completion status of every major feature and subsystem 
 | Role-based permission enforcement (Viewers cannot start/complete sprints) | ✅ |
 | Full Pest automated test coverage for sprint lifecycle and board filtering | ✅ |
 
+---
+
+## Milestones & Release Tracking
+
+| Feature | Status |
+|---------|--------|
+| Target release milestones with title, description, and due date | ✅ |
+| Milestone status workflow (Open ↔ Closed archive) | ✅ |
+| Real-time completion progress bar (% of tasks completed) | ✅ |
+| Task allocation & unlinking to/from milestones | ✅ |
+| Soft deletion preserving tasks with automatic milestone unlinking | ✅ |
+| Project navigation tab integration & modals | ✅ |
+| Role-based permission enforcement (Viewer restrictions) | ✅ |
+
+---
+
+## Task Dependencies & Blocker Graph
+
+| Feature | Status |
+|---------|--------|
+| Directed prerequisite blocker relationships (`depends_on_task_id`) | ✅ |
+| $O(1)$ fast lookups with composite & reverse indexing on `task_dependencies` | ✅ |
+| Circular dependency prevention using $O(V + E)$ BFS cycle detection algorithm | ✅ |
+| Self-dependency and cross-project dependency rejection | ✅ |
+| Dynamic `isBlocked()` and unresolved dependencies counters | ✅ |
+| Visual blocker alert warning banner on Task detail view | ✅ |
+| Dedicated blocker management card with quick-add prerequisite selector | ✅ |
+
+---
+
+## Time Tracking & Work Logs
+
+| Feature | Status |
+|---------|--------|
+| Log task work time (hours + minutes, date, description) | ✅ |
+| Estimated vs. actual time comparison on task page | ✅ |
+| Work logs timeline on Task detail view with author avatars | ✅ |
+| Secure deletion policy (author of log or project owner only) | ✅ |
+| Project-wide team time report (`/projects/{project}/time-report`) | ✅ |
+| Contributor breakdown metrics with aggregate progress bars | ✅ |
+| Complete Pest automated test coverage (58 assertions across all 3 features) | ✅ |
+
+
