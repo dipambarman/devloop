@@ -50,7 +50,7 @@ This document tracks the completion status of every major feature and subsystem 
 | Project slug generation for URLs | ✅ |
 | GitHub repository linking | ✅ |
 | Project status tracking | ✅ |
-| Project member invitation by email | ✅ |
+| Project member invitation by email or GitHub username (@username) | ✅ |
 | Member role assignment (member/viewer) | ✅ |
 | Member removal by project owner | ✅ |
 | Project activity timeline | ✅ |
@@ -68,7 +68,7 @@ This document tracks the completion status of every major feature and subsystem 
 | Task tags (many-to-many) | ✅ |
 | Task comments with threaded display | ✅ |
 | Inline status/priority/assignee updates | ✅ |
-| Task filtering by status, priority, project | ✅ |
+| Task filtering by status, priority/severity aliases, project (auto-submitting with sticky tray) | ✅ |
 | Task search by title and description | ✅ |
 | Soft deletes for tasks | ✅ |
 
@@ -282,6 +282,24 @@ This document tracks the completion status of every major feature and subsystem 
 | Automatic regression alert dispatching when previously fixed bugs reappear | ✅ |
 | Project Settings & Error Tracker UI integration modal for webhooks | ✅ |
 | Full Pest automated test coverage (creation, validation, pinging, deletion, ingest triggers) | ✅ |
+
+---
+
+## Developer Experience & UI Refinements
+
+| Feature | Status |
+|---------|--------|
+| Developer Identity Header with gradient ring, GitHub handle, OAuth Verified badge, and live stat counters | ✅ |
+| Overview / Edit mode toggle on Developer Profile with styled bio and interactive social link cards | ✅ |
+| Interactive Skills Tag Manager (tag chips with '×' removal and Enter/comma addition) | ✅ |
+| Direct profile navigation from top-right header account badge (removed redundant dropdown) | ✅ |
+| Clean left sidebar (removed duplicated user snippet from sidebar bottom) | ✅ |
+| Dedicated Session Sign Out block positioned directly above Danger Zone on profile page | ✅ |
+| Snippet line threshold clamping (10-line max-height) with gradient fade overlay | ✅ |
+| Interactive Alpine.js "Read more (+X lines)" / "Show less" toggle for code snippets | ✅ |
+| Unified Task Priority & Severity aliases across `/tasks` and `/projects/{id}` | ✅ |
+| One-click "Share Link" clipboard copy button for rapid team onboarding | ✅ |
+| Brand logo featuring Bug Hunt monitor emblem across landing, guest, and navbar | ✅ |
 
 
 
