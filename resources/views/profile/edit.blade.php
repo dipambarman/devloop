@@ -127,6 +127,10 @@
                 @include('profile.partials.github-account-info')
             </x-card>
 
+            <x-card class="border-border">
+                @include('profile.partials.logout-user-form')
+            </x-card>
+
             <x-card class="border-danger/20">
                 @include('profile.partials.delete-user-form')
             </x-card>

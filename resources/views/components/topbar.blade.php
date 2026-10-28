@@ -88,47 +88,26 @@
             </div>
         </div>
 
-        <!-- Profile Dropdown -->
-        <div class="relative" x-data="{ open: false }" @click.outside="open = false" @close.stop="open = false">
-            <div @click="open = ! open" class="cursor-pointer">
-                <button class="flex items-center gap-2 text-sm font-medium text-secondary-text hover:text-primary-text focus:outline-none transition-colors">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center text-white font-semibold text-xs border border-border shadow-sm">
-                        {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
-                    </div>
-                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                </button>
-            </div>
-
-            <div x-show="open"
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="transform opacity-0 scale-95"
-                    x-transition:enter-end="transform opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-75"
-                    x-transition:leave-start="transform opacity-100 scale-100"
-                    x-transition:leave-end="transform opacity-0 scale-95"
-                    class="absolute right-0 mt-2 w-48 rounded-xl shadow-xl glass z-50 py-1"
-                    style="display: none;">
-                
-                <div class="px-4 py-2 border-b border-border">
-                    <p class="text-sm font-medium text-primary-text">{{ Auth::user()->name ?? 'User' }}</p>
-                    <p class="text-xs text-secondary-text">Manage your account</p>
+        <!-- Account Profile Link (Opens Profile Directly) -->
+        <a href="{{ route('profile.edit') }}" 
+           class="flex items-center gap-2.5 px-2 py-1.5 sm:px-3 sm:py-1.5 rounded-xl border {{ request()->routeIs('profile.*') ? 'border-primary/50 bg-primary/10 text-primary' : 'border-border bg-surface/60 hover:bg-surface-hover hover:border-primary/30 text-secondary-text hover:text-primary-text' }} transition-all group focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
+           title="{{ __('My Account & Profile') }}"
+        >
+            @if(Auth::user()->avatar)
+                <img src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" class="w-7 h-7 rounded-lg object-cover ring-1 ring-border group-hover:ring-primary/40 transition-all">
+            @else
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-r from-primary to-accent flex items-center justify-center text-white font-semibold text-xs shadow-sm font-mono">
+                    {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 1)) }}
                 </div>
-
-                <x-dropdown-link :href="route('profile.edit')" class="text-secondary-text hover:bg-surface-hover hover:text-primary-text">
-                    {{ __('Profile') }}
-                </x-dropdown-link>
-
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-dropdown-link :href="route('logout')"
-                            onclick="event.preventDefault(); this.closest('form').submit();" class="text-danger hover:bg-danger/10 hover:text-danger">
-                        {{ __('Log Out') }}
-                    </x-dropdown-link>
-                </form>
+            @endif
+            <div class="hidden sm:flex flex-col text-left">
+                <span class="text-xs font-semibold leading-tight text-primary-text group-hover:text-primary transition-colors truncate max-w-[120px]">
+                    {{ Auth::user()->name ?? 'User' }}
+                </span>
+                <span class="text-[10px] text-secondary-text leading-tight font-mono">
+                    {{ Auth::user()->github_username ? '@' . Auth::user()->github_username : 'Developer' }}
+                </span>
             </div>
-        </div>
+        </a>
     </div>
 </header>
