@@ -23,22 +23,27 @@
             </h2>
 
             <p class="mt-1 text-sm text-secondary-text">
-                {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
+                {{ __('Once your account is deleted, all of its resources and data will be permanently deleted.') }}
+                @if(Auth::user()->password)
+                    {{ __('Please enter your password to confirm you would like to permanently delete your account.') }}
+                @endif
             </p>
 
-            <div class="mt-6">
-                <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
+            @if(Auth::user()->password)
+                <div class="mt-6">
+                    <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
 
-                <x-text-input
-                    id="password"
-                    name="password"
-                    type="password"
-                    class="mt-1 block w-3/4 !bg-background !border-border !text-primary-text focus:!border-danger focus:!ring-danger"
-                    placeholder="{{ __('Password') }}"
-                />
+                    <x-text-input
+                        id="password"
+                        name="password"
+                        type="password"
+                        class="mt-1 block w-3/4 !bg-background !border-border !text-primary-text focus:!border-danger focus:!ring-danger"
+                        placeholder="{{ __('Password') }}"
+                    />
 
-                <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
-            </div>
+                    <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
+                </div>
+            @endif
 
             <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-border">
                 <x-secondary-button x-on:click="$dispatch('close')">

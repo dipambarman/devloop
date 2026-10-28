@@ -13,6 +13,7 @@ use App\Http\Controllers\MilestoneController;
 use App\Http\Controllers\ProjectKeyController;
 use App\Http\Controllers\SnippetController;
 use App\Http\Controllers\SprintController;
+use App\Http\Controllers\SlackWebhookController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskDependencyController;
 use App\Http\Controllers\TimeLogController;
@@ -91,6 +92,9 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
             Route::post('projects/{project}/bugs/{bug}/convert-to-task', [BugController::class, 'convertToTask'])->name('projects.bugs.convertToTask');
             Route::post('projects/{project}/keys', [ProjectKeyController::class, 'store'])->name('projects.keys.store');
             Route::delete('projects/{project}/keys', [ProjectKeyController::class, 'destroy'])->name('projects.keys.destroy');
+            Route::post('projects/{project}/slack-webhooks', [SlackWebhookController::class, 'store'])->name('projects.slackWebhooks.store');
+            Route::patch('projects/{project}/slack-webhooks/{slackWebhook}', [SlackWebhookController::class, 'update'])->name('projects.slackWebhooks.update');
+            Route::post('projects/{project}/slack-webhooks/{slackWebhook}/test', [SlackWebhookController::class, 'test'])->name('projects.slackWebhooks.test');
             Route::post('projects/{project}/sprints', [SprintController::class, 'store'])->name('projects.sprints.store');
             Route::patch('projects/{project}/sprints/{sprint}', [SprintController::class, 'update'])->name('projects.sprints.update');
             Route::patch('projects/{project}/sprints/{sprint}/start', [SprintController::class, 'start'])->name('projects.sprints.start');
@@ -141,6 +145,7 @@ Route::middleware(['auth', 'throttle:global'])->group(function () {
             Route::delete('projects/{project}/milestones/{milestone}', [MilestoneController::class, 'destroy'])->name('projects.milestones.destroy');
             Route::delete('projects/{project}/tasks/{task}/dependencies/{dependency}', [TaskDependencyController::class, 'destroy'])->name('projects.tasks.dependencies.destroy');
             Route::delete('projects/{project}/tasks/{task}/time-logs/{timeLog}', [TimeLogController::class, 'destroy'])->name('projects.tasks.timeLogs.destroy');
+            Route::delete('projects/{project}/slack-webhooks/{slackWebhook}', [SlackWebhookController::class, 'destroy'])->name('projects.slackWebhooks.destroy');
         });
     });
 });

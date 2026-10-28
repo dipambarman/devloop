@@ -122,6 +122,11 @@ class Project extends Model
         return $this->hasMany(Milestone::class);
     }
 
+    public function slackWebhooks()
+    {
+        return $this->hasMany(SlackWebhook::class);
+    }
+
     public function totalLoggedHours(): float
     {
         $minutes = TimeLog::whereHas('task', fn($q) => $q->where('project_id', $this->id))

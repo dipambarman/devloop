@@ -12,7 +12,7 @@
             </x-card>
 
             <x-card>
-                @include('profile.partials.update-password-form')
+                @include('profile.partials.github-account-info')
             </x-card>
 
             <x-card>

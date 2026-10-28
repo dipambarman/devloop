@@ -10,8 +10,11 @@ use Illuminate\Support\Facades\DB;
 class BugIngestService
 {
     public function __construct(
-        protected ErrorFingerprintService $fingerprintService
-    ) {}
+        protected ErrorFingerprintService $fingerprintService,
+        protected ?SlackWebhookService $slackService = null
+    ) {
+        $this->slackService ??= app(SlackWebhookService::class);
+    }
 
     /**
      * Ingest an error into a project.
@@ -41,7 +44,7 @@ class BugIngestService
         $normalized = $this->fingerprintService->normalizeMessage($cleanMessage);
         $title = mb_substr($normalized ?: ($errorType ?: 'Unhandled Error'), 0, 120);
 
-        return DB::transaction(function () use (
+        $result = DB::transaction(function () use (
             $project,
             $fingerprint,
             $title,
@@ -63,6 +66,7 @@ class BugIngestService
                 ->first();
 
             $isRegression = false;
+            $isNew = false;
 
             if ($bug) {
                 // If bug was marked fixed, reopen as a regression!
@@ -104,6 +108,7 @@ class BugIngestService
                 }
                 $bug->save();
             } else {
+                $isNew = true;
                 $bug = Bug::create([
                     'project_id' => $project->id,
                     'fingerprint' => $fingerprint,
@@ -143,8 +148,24 @@ class BugIngestService
                 ]);
             }
 
-            return $bug;
+            return [$bug, $isNew, $isRegression];
         });
+
+        [$bug, $isNew, $isRegression] = $result;
+
+        // Dispatch Slack alerts if webhooks exist
+        try {
+            if ($isRegression) {
+                $this->slackService->dispatchForBug($bug, 'bug.regression');
+            } elseif ($isNew) {
+                $this->slackService->dispatchForBug($bug, 'bug.created');
+            }
+        } catch (\Throwable $e) {
+            // Webhook alert dispatching should never abort ingest
+            \Illuminate\Support\Facades\Log::warning('Slack webhook dispatch failed during ingest: ' . $e->getMessage());
+        }
+
+        return $bug;
     }
 
     /**
