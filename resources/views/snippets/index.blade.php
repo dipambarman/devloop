@@ -88,11 +88,45 @@
                             </a>
                         </div>
                     </div>
-                    
-                    <div class="bg-[#1e1e1e] rounded-xl p-4 overflow-x-auto text-sm font-mono text-gray-300 relative group-hover:ring-1 ring-border transition-all">
-                        <pre><code class="language-{{ $snippet->language }}">{{ $snippet->code }}</code></pre>
+                    @php
+                        $lineCount = substr_count($snippet->code, "\n") + 1;
+                        $threshold = 10;
+                        $isLong = $lineCount > $threshold;
+                    @endphp
+
+                    <div x-data="{ expanded: false, isLong: {{ $isLong ? 'true' : 'false' }} }" class="relative">
+                        <div 
+                            :class="expanded || !isLong ? 'max-h-none' : 'max-h-56 overflow-hidden'" 
+                            class="bg-[#1e1e1e] rounded-xl p-4 overflow-x-auto text-sm font-mono text-gray-300 relative group-hover:ring-1 ring-border transition-all"
+                        >
+                            <pre><code class="language-{{ $snippet->language }}">{{ $snippet->code }}</code></pre>
+                            
+                            @if($isLong)
+                                <div 
+                                    x-show="!expanded" 
+                                    class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#1e1e1e] via-[#1e1e1e]/85 to-transparent pointer-events-none rounded-b-xl"
+                                ></div>
+                            @endif
+                        </div>
+
+                        @if($isLong)
+                            <div class="mt-2.5 flex items-center justify-between px-1">
+                                <button 
+                                    type="button"
+                                    @click="expanded = !expanded" 
+                                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover transition-colors focus:outline-none group/btn"
+                                >
+                                    <span x-text="expanded ? 'Show less' : 'Read more (+{{ $lineCount - $threshold }} lines)'"></span>
+                                    <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="expanded ? 'rotate-180' : 'group-hover/btn:translate-y-0.5'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <span class="text-[11px] font-mono text-secondary-text bg-background/50 px-2 py-0.5 rounded border border-border">
+                                    {{ $lineCount }} lines
+                                </span>
+                            </div>
+                        @endif
                     </div>
-                    
                     <div class="mt-4 pt-4 border-t border-border flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             @if($snippet->project)

@@ -56,19 +56,4 @@
             Snippets
         </x-nav-link>
     </nav>
-
-    <!-- User Profile Snippet in Sidebar -->
-    <div class="p-4 border-t border-border">
-        <div class="flex items-center gap-3 px-2">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center text-white font-semibold text-xs">
-                {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
-            </div>
-            <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-primary-text truncate">
-                    {{ Auth::user()->name ?? 'User' }}
-                </p>
-                <p class="text-xs text-secondary-text">Developer</p>
-            </div>
-        </div>
-    </div>
 </aside>
